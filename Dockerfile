@@ -11,12 +11,17 @@ WORKDIR /app
 # Clone the repository and checkout dev branch
 RUN git clone -b dev https://github.com/Spidious/LostInLafferre_Frontend.git .
 
+# Move into the correct folder inside the repository
+WORKDIR /app/lost_in_laff
+
 # Install dependencies
-WORKDIR lost_in_laff
 RUN npm install
+
+# Build the app (required for production start)
+RUN npm run build
 
 # Expose the port
 EXPOSE 3000
 
 # Poll for updates and start the app
-CMD ["/bin/sh", "-c", "while true; do git fetch origin dev && git reset --hard origin/dev && npm install && nodemon --watch . --exec 'npm run start'; sleep 60; done"]
+CMD ["/bin/sh", "-c", "while true; do git pull origin dev && cd /app/lost_in_laff && npm install && npm run build && nodemon --watch . --exec 'npm run start'; sleep 60; done"]
