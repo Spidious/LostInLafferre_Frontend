@@ -20,8 +20,8 @@ function DropdownMenu() {
   };
 
   return (
-    <div className="dropdown">
-      <button className="dropdown-button" onClick={toggleDropdown}>
+    <div>
+      <button onClick={toggleDropdown}>
         {selectedOption ? selectedOption : 'Select an option'}
       </button>
       {isOpen && (
@@ -36,3 +36,5 @@ function DropdownMenu() {
     </div>
   );
 }
+
+export default DropdownMenu;
