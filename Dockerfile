@@ -24,4 +24,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Poll for updates and start the app
-CMD ["/bin/sh", "-c", "cd /app/lost_in_laff && npm install && npm run build && nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git pull origin dev; sleep 60; done"]
+CMD ["/bin/sh", "-c", "cd /app/lost_in_laff && npm install && npm run build && nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git fetch origin dev && git reset --hard origin/dev; sleep 15; done"]
