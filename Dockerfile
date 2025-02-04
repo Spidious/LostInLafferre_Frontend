@@ -12,6 +12,7 @@ WORKDIR /app
 RUN git clone -b dev https://github.com/Spidious/LostInLafferre_Frontend.git .
 
 # Install dependencies
+WORKDIR lost_in_laff
 RUN npm install
 
 # Expose the port
