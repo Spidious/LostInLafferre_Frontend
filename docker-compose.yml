@@ -1,0 +1,7 @@
+services:
+  lost_in_lafferre:
+    build:
+      context: .
+    container_name: lostinlaff_frontend
+    ports:
+      - "3000:3000"
