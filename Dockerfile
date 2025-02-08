@@ -25,7 +25,7 @@ RUN npm run build
 EXPOSE 3000
 
 # Set mode argument (default: remote)
-ARG MODE=remote
+ARG MODE=local
 ENV MODE=$MODE
 
 # Start the app based on mode
