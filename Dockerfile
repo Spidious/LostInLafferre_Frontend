@@ -8,9 +8,6 @@ RUN apk add --no-cache git \
 # Set working directory
 WORKDIR /app
 
-RUN cat /etc/resolv.conf > output.txt
-
-
 RUN ping 1.1.1.1 -c 1 && ping github.com -c 1
 # Clone the repository and checkout dev branch
 RUN git clone -b main https://github.com/Spidious/LostInLafferre_Frontend.git .
