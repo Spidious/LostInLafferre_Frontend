@@ -8,10 +8,10 @@ First, run the development server:
 
 The project is using docker compose. Having this installed is a requirement unless you choose to run it uncontainerized. *Instructions Below*
 
-To run the project locally in a container, simply run the following command.
+To run the project locally in a container, simply run the following command.<br>
 `docker compose --profile <profile_name> up --build   # Available profiles are 'local'/'remote'`
 
-You can also choose to run the container pulling from any specified branch by using
+You can also choose to run the container pulling from any specified branch by using<br>
 `BRANCH=<branch>   # Default is 'dev'`
 
 EXAMPLES:
