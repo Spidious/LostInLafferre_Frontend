@@ -23,7 +23,7 @@ services:
     build:
       context: .
       args:
-        MODE: remote
+        MODE: local 
     container_name: cap_local 
     ports:
       - "3000:3000"
