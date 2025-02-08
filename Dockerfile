@@ -8,9 +8,10 @@ RUN apk add --no-cache git \
 # Set working directory
 WORKDIR /app
 
-RUN ping 1.1.1.1 -c 1 && ping github.com -c 1
 # Clone the repository and checkout dev branch
-RUN git clone -b main https://github.com/Spidious/LostInLafferre_Frontend.git .
+ARG BRANCH=main
+ENV BRANCH=$BRANCH
+RUN git clone -b ${BRANCH} https://github.com/Spidious/LostInLafferre_Frontend.git .
 
 # Move into the correct folder inside the repository
 WORKDIR /app/lost_in_laff
@@ -24,7 +25,7 @@ RUN npm run build
 # Expose the port
 EXPOSE 3000
 
-# Set mode argument (default: remote)
+# Set mode argument (default: local)
 ARG MODE=local
 ENV MODE=$MODE
 
@@ -33,5 +34,5 @@ CMD ["/bin/sh", "-c", \
     "if [ \"$MODE\" = \"local\" ]; then \
         npm run dev; \
     else \
-        cd /app/lost_in_laff && npm install && npm run build && nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git fetch origin main && git reset --hard origin/main; sleep 15; done; \
+        cd /app/lost_in_laff && npm install && npm run build && nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git fetch origin ${BRANCH} && git reset --hard origin/${BRANCH}; sleep 15; done; \
     fi"]
