@@ -25,7 +25,7 @@ BRANCH=main docker compose --profile remote up --build
 
 #### What are the differences between remote / local modes:
 
-**Local:** Meant for running containers on your local machine. Update files using the local `lost_in_laff` folder to see the changes reflected in the container.
+**Local:** Meant for running containers on your local machine. Update files using the local `lost_in_laff` folder to see the changes reflected in the container. (Files monitored: .js .json .css .tsx .ts)
 **Remote:** Meant for being run and forgotten. Run the container using this setting and it will continuously fetch from the specified branch. Nodemon keeps the server up to date. Update the files by pushing to the specified branch.
 
 ### Running Without Docker
