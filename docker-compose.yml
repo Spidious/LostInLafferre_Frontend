@@ -5,30 +5,31 @@ networks:
     driver: bridge
 
 services:
-  lost_in_lafferre:
+  lost_in_lafferre_remote:
     build:
       context: .
       args:
-        MODE: ${MODE:-local}  # Uses an environment variable, defaults to 'local' if not set
-        BRANCH: ${BRANCH:-dev}  # Uses an environment variable, defaults to 'main' if not set
-    container_name: capstone 
+        MODE: remote 
+        BRANCH: ${BRANCH:-dev}  # Options: <any git branch> DEFAULT: dev
+    container_name: cap_remote
     networks:
       - local_network
     ports:
       - "3000:3000"
     restart: unless-stopped 
-    # profiles:
-    #   - remote
+    profiles:
+      - remote
 
-  # lost_in_lafferre_local:
-  #   build:
-  #     context: .
-  #     args:
-  #       MODE: local 
-  #       BRANCH: dev
-  #   container_name: cap_local 
-  #   ports:
-  #     - "3000:3000"
-  #   restart: no
-  #   profiles:
-  #     - local
+  lost_in_lafferre_local:
+    build:
+      context: .
+      args:
+        MODE: local
+    container_name: cap_local 
+    ports:
+      - "3000:3000"
+    restart: no
+    volumes:
+      - ./lost_in_laff:/app/lost_in_laff
+    profiles:
+      - local
