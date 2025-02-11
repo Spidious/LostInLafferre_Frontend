@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
+import * as ScrollArea from "@radix-ui/react-scroll-area";
 import { Check, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -48,21 +49,29 @@ const SelectContent = React.forwardRef<
       className={cn(
         // Styles for the dropdown container including animations
         // Position-specific translations for the popper
-        "rounded-md border bg-gray-500",
+        "w-80",
         className
       )}
       position={position}
       {...props}
     >
-      {/* Viewport contains the scrollable list of options */}
+      {/* Styling for the dropdown menu when expanded */}
       <SelectPrimitive.Viewport
         className={cn(
-          "bg-white ",
+          "bg-white rounded-lg border-2 border-grey-100",
           position === "popper" &&
             "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
         )}
       >
-        {children}
+        {/* Styling and set up for the dropdown scroll bar */}
+        <ScrollArea.Root  className="max-h-60 overflow-y-auto">
+          <ScrollArea.Viewport>
+            {children}
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar orientation='vertical'>
+            <ScrollArea.Thumb />
+          </ScrollArea.Scrollbar>
+        </ScrollArea.Root>
       </SelectPrimitive.Viewport>
     </SelectPrimitive.Content>
   </SelectPrimitive.Portal>
