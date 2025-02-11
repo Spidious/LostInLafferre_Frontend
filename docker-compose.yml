@@ -8,6 +8,7 @@ services:
   lost_in_lafferre_remote:
     build:
       context: .
+      dockerfile: Frontend_Dockerfile
       args:
         MODE: remote 
         BRANCH: ${BRANCH:-dev}  # Options: <any git branch> DEFAULT: dev
@@ -23,6 +24,7 @@ services:
   lost_in_lafferre_local:
     build:
       context: .
+      dockerfile: Frontend_Dockerfile
       args:
         MODE: local
     container_name: cap_local 
