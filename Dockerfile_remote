@@ -11,7 +11,7 @@ WORKDIR /app
 # Clone the repository and checkout dev branch
 ARG BRANCH=main
 ENV BRANCH=$BRANCH
-RUN if [ "$MODE" = "remote" ]; then git clone -b ${BRANCH} https://github.com/Spidious/LostInLafferre_Frontend.git .; fi
+RUN git clone -b ${BRANCH} https://github.com/Spidious/LostInLafferre_Frontend.git .
 
 # Move into the correct folder inside the repository
 WORKDIR /app/lost_in_laff
@@ -23,22 +23,5 @@ EXPOSE 3000
 RUN npm install
 RUN npm run build
 
-
-# Start the app based on mode
-# CMD ["/bin/sh", "-c", \
-#     "if [ \"$MODE\" = \"local\" ]; then \
-#         echo Running `npm install` && npm install \
-#         && \
-#         echo Running `npm run build` && npm run build \
-#         && \
-#         echo Running Server && nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev'; \
-#     else \
-#         echo Running `npm install` && npm install \
-#         && \
-#         echo Running `npm run build` && npm run build \
-#         && \
-#         echo Running Server && nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git fetch origin ${BRANCH} && git reset --hard origin/${BRANCH}; sleep 15; done; \
-#     fi"]
-
-
+# Launch the server
 CMD ["/bin/sh", "-c", "nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git fetch origin ${BRANCH} && git reset --hard origin/${BRANCH}; sleep 15; done; "]
