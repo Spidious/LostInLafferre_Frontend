@@ -11,6 +11,7 @@ const Map = ({ from, to }: MapProps) => {
       {/* Placeholder for the actual map rendering */}
       <div className="absolute bottom-4 left-4">
         <div className="w-6 h-6 bg-emerald-700 rounded-full" />
+        {from} {to}
       </div>
     </div>
   );
