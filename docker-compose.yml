@@ -1,0 +1,35 @@
+version: '3'
+
+networks:
+  local_network:
+    driver: bridge
+
+services:
+  lost_in_lafferre_remote:
+    build:
+      context: .
+      dockerfile: Dockerfile_remote
+      args:
+        BRANCH: ${BRANCH:-dev}  # Options: <any git branch> DEFAULT: dev
+    container_name: cap_remote
+    networks:
+      - local_network
+    ports:
+      - "3000:3000"
+    restart: unless-stopped 
+    profiles:
+      - remote
+
+  lost_in_lafferre_local:
+    build:
+      context: .
+      dockerfile: Dockerfile_local
+    container_name: cap_local 
+    ports:
+      - "3000:3000"
+    restart: no
+    volumes:
+      - ./lost_in_laff:/app/lost_in_laff
+    user: "${UID}:${GID}" 
+    profiles:
+      - local
