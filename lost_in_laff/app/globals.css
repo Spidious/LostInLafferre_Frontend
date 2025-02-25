@@ -7,15 +7,19 @@
   --foreground: #171717;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #48ff00;
-  }
-}
-
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.drop-down-menu {
+  box-sizing: border-box;
+  
+  position: relative;
+  width: 1256px;
+  height: 340px;
+  
+  border: 1px dashed #9747FF;
+  border-radius: 5px;
+  }

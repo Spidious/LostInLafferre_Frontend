@@ -12,6 +12,8 @@ COPY lost_in_laff .
 
 WORKDIR /app/lost_in_laff
 
+RUN rm -rf .next node_modules
+
 EXPOSE 3000
 
 RUN npm install 

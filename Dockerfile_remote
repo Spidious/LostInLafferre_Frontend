@@ -16,6 +16,8 @@ RUN git clone -b ${BRANCH} https://github.com/Spidious/LostInLafferre_Frontend.g
 # Move into the correct folder inside the repository
 WORKDIR /app/lost_in_laff
 
+RUN rm -rf .next node_modules
+
 # Expose the port
 EXPOSE 3000
 
