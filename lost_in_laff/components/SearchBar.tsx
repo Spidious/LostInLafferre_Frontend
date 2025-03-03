@@ -15,7 +15,6 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
     setIsListVisible(true);
   };
 
-
   const handleSelect = (selectedValue: string) => {
     placeholder = selectedValue;
     onChange(selectedValue);
@@ -23,8 +22,10 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
   }
 
   return (
-    <Command value={value} onValueChange={onChange} className="rounded-lg border shadow-md md:min-w-[450px]">
+    <Command className="rounded-lg border shadow-md md:min-w-[450px]">
       <CommandInput 
+        value={value}
+        onValueChange={onChange}
         placeholder={placeholder}
         onClick={handleInputClick}
         />
