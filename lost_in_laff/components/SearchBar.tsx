@@ -1,5 +1,5 @@
-import React from 'react';
-import { Select, SelectContent, SelectTrigger, SelectValue, SelectItem } from '@/components/ui/select';
+import React, { useRef, useState } from 'react';
+import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 
 interface SearchBarProps {
   value: string;
@@ -9,19 +9,37 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) => {
+  const [isListVisible, setIsListVisible] = useState(false);
+
+  const handleInputClick = () => {
+    setIsListVisible(true);
+  };
+
+
+  const handleSelect = (selectedValue: string) => {
+    placeholder = selectedValue;
+    onChange(selectedValue);
+    setIsListVisible(false);
+  }
+
   return (
-    <Select value={value} onValueChange={onChange}>
-      <SelectTrigger>
-        <SelectValue placeholder={placeholder} />
-      </SelectTrigger>
-        <SelectContent>
-          {options.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-    </Select>
+    <Command value={value} onValueChange={onChange} className="rounded-lg border shadow-md md:min-w-[450px]">
+      <CommandInput 
+        placeholder={placeholder}
+        onClick={handleInputClick}
+        />
+        {isListVisible && (
+        <CommandList>
+          <CommandGroup heading="Suggestions">
+            {options.map((option) => (
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}>
+                {option.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+        </CommandList>
+      )}
+    </Command>
   );
 };
 
