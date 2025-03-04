@@ -1,0 +1,29 @@
+# Use Node.js LTS version
+FROM node:18-alpine
+
+# Install git and nodemon
+RUN apk add --no-cache git \
+    && npm install -g nodemon
+
+# Set working directory
+WORKDIR /app
+
+# Clone the repository and checkout dev branch
+ARG BRANCH=main
+ENV BRANCH=$BRANCH
+RUN git clone -b ${BRANCH} https://github.com/Spidious/LostInLafferre_Frontend.git .
+
+# Move into the correct folder inside the repository
+WORKDIR /app/lost_in_laff
+
+RUN rm -rf .next node_modules
+
+# Expose the port
+EXPOSE 3000
+
+# Run npm commands
+RUN npm install
+RUN npm run build
+
+# Launch the server
+CMD ["/bin/sh", "-c", "nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git fetch origin ${BRANCH} && git reset --hard origin/${BRANCH}; sleep 15; done; "]

@@ -1,0 +1,22 @@
+# Use Node.js LTS version
+FROM node:18-alpine
+
+# Install git and nodemon
+RUN apk add --no-cache git \
+    && npm install -g nodemon
+
+# Set working directory
+WORKDIR /app
+
+COPY lost_in_laff .
+
+WORKDIR /app/lost_in_laff
+
+RUN rm -rf .next node_modules
+
+EXPOSE 3000
+
+RUN npm install 
+RUN npm run build
+
+CMD ["/bin/sh", "-c", "nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev'"]
