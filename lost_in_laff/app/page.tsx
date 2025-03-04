@@ -5,15 +5,28 @@ import SearchBar from '@/components/SearchBar';
 import Map from '@/components/Map';
 import Directions from '@/components/Directions';
 import basement from '@/basement.json';
+import firstLevel from '@/firstLevel.json';
+import secondLevel from '@/secondLevel.json';
+import thirdLevel from '@/thirdLevel.json';
+
 
 export default function Home() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
-  const roomOptions = Object.entries(basement).map(([room, aliases]) => ({
+  const floors = {
+    basement,
+    firstLevel,
+    secondLevel,
+    thirdLevel
+  };
+
+  const roomOptions = Object.entries(floors).flatMap(([floorName, floorData]) =>
+    Object.entries(floorData).map(([room, aliases]) => ({
     value: room,
     label: `${room} ${aliases ? `(${aliases.split(',')})` : ''}`
-  }));
+  }))
+);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
