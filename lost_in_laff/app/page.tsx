@@ -4,17 +4,29 @@ import { useState } from 'react';
 import SearchBar from '@/components/searchBar';
 import Map from '@/components/map';
 import Directions from '@/components/directions';
-import basement from '@/basement.json';
 import { getCoordinateData } from '@/services/getCoordinates';
+import basement from '@/floors/basement.json';
+import firstLevel from '@/floors/firstLevel.json';
+import secondLevel from '@/floors/secondLevel.json';
+import thirdLevel from '@/floors/thirdLevel.json';
 
 export default function Home() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
-  const roomOptions = Object.entries(basement).map(([room, aliases]) => ({
+  const floors = {
+    basement,
+    firstLevel,
+    secondLevel,
+    thirdLevel
+  };
+
+  const roomOptions = Object.entries(floors).flatMap(([floorName, floorData]) =>
+    Object.entries(floorData).map(([room, aliases]) => ({
     value: room,
     label: `${room} ${aliases ? `(${aliases.split(',')})` : ''}`
-  }));
+  }))
+);
 
   const handleSubmit = async () => {
     try {
