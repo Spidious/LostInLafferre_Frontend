@@ -4,10 +4,10 @@ import { useState } from 'react';
 import SearchBar from '@/components/SearchBar';
 import Map from '@/components/Map';
 import Directions from '@/components/Directions';
-import basement from '@/basement.json';
-import firstLevel from '@/firstLevel.json';
-import secondLevel from '@/secondLevel.json';
-import thirdLevel from '@/thirdLevel.json';
+import basement from '@/floors/basement.json';
+import firstLevel from '@/floors/firstLevel.json';
+import secondLevel from '@/floors/secondLevel.json';
+import thirdLevel from '@/floors/thirdLevel.json';
 
 
 export default function Home() {
