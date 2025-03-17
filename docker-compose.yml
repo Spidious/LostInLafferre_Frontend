@@ -5,6 +5,22 @@ networks:
     driver: bridge
 
 services:
+  lost_in_lafferre_backend:
+    build:
+      context: ../LostInLafferre
+    container_name: cap_backend
+    networks:
+      - local_network
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    profiles:
+      - remote
+      - local
+      - backend
+    environment:
+      - RUST_BACKTRACE=1
+
   lost_in_lafferre_remote:
     build:
       context: .
@@ -16,7 +32,7 @@ services:
       - local_network
     ports:
       - "3000:3000"
-    restart: unless-stopped 
+    restart: unless-stopped
     profiles:
       - remote
 
@@ -24,12 +40,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile_local
-    container_name: cap_local 
+    container_name: cap_local
     ports:
       - "3000:3000"
     restart: no
     volumes:
       - ./lost_in_laff:/app/lost_in_laff
-    user: "${UID}:${GID}" 
+    user: "${UID}:${GID}"
     profiles:
       - local

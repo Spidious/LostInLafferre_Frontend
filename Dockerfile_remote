@@ -23,7 +23,7 @@ EXPOSE 3000
 
 # Run npm commands
 RUN npm install
-RUN npm run build
+# RUN npm run build
 
 # Launch the server
 CMD ["/bin/sh", "-c", "nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev' & while true; do git fetch origin ${BRANCH} && git reset --hard origin/${BRANCH}; sleep 15; done; "]
