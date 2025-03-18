@@ -2,8 +2,9 @@
 FROM node:18-alpine
 
 # Install git and nodemon
-RUN apk add --no-cache git \
-    && npm install -g nodemon
+RUN apk add --no-cache git curl\
+    && npm install -g nodemon 
+
 
 # Set working directory
 WORKDIR /app

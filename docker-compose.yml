@@ -2,6 +2,7 @@ version: '3'
 
 networks:
   local_network:
+    name: capstone_network
     driver: bridge
 
 services:
@@ -41,6 +42,8 @@ services:
       context: .
       dockerfile: Dockerfile_local
     container_name: cap_local
+    networks:
+      - local_network
     ports:
       - "3000:3000"
     restart: no
