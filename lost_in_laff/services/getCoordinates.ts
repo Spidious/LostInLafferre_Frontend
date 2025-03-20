@@ -12,14 +12,14 @@ export const getCoordinateData = async (data: SourceDestinationData) => {
   const apiUrl = `${BASE_URL}${endpoint}`;
 
   try {
-    const response = await axios.post(apiUrl, data, {
+    const response = await axios.get(apiUrl, {
       headers: {
         'Content-Type': 'application/json',
       },
     });
     return response.data;
   } catch (error) {
-    console.error('Error sending address data:', error);
+    console.error('Error fetching coordinate data:', error);
     throw error;
   }
 };
