@@ -5,6 +5,7 @@ import Image from "next/image";
 interface MapProps {
   from: string;
   to: string;
+  apiResponse?: string | null;
 }
 
 // Dynamically import the map component with SSR disabled
@@ -35,14 +36,13 @@ const MapWithNoSSR = dynamic(
   }
 );
 
-const Map = ({ from, to }: MapProps) => {
+const Map = ({ from, to, apiResponse }: MapProps) => {
   // Placeholder svg file name
   const svgFileName = "zero_output.svg";
   const imageFileName = "zero.png";
   // Get svg file path
   const svgFilePath = `/maps/${svgFileName}`;
   const imageFilePath = `/maps/${imageFileName}`;
-
 
   return (
     <div className="w-full aspect-square bg-emerald-50 rounded-lg border-2 border-emerald-200 relative">
@@ -51,7 +51,7 @@ const Map = ({ from, to }: MapProps) => {
         {from} {to}
       </div>
       <div className="w-full h-full">
-        <MapWithNoSSR from={from} to={to} svgFile={svgFilePath} imageFile={imageFilePath} />
+        <MapWithNoSSR from={from} to={to} apiResponse={apiResponse} svgFile={svgFilePath} imageFile={imageFilePath} />
       </div>
     </div>
   );

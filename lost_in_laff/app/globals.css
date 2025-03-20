@@ -23,3 +23,15 @@ body {
   border: 1px dashed #9747FF;
   border-radius: 5px;
   }
+
+  .leaflet-container {
+    background: #edfff8 !important;
+  }
+
+  svg:focus {
+    outline: none;
+  }
+
+  #toMarker {
+    filter: hue-rotate(145deg);
+  }

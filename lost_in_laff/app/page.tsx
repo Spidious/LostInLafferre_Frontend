@@ -14,6 +14,8 @@ export default function Home() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
+  const [apiResponse, setApiResponse] = useState(null);
+
   const floors = {
     basement,
     firstLevel,
@@ -31,6 +33,7 @@ export default function Home() {
   const handleSubmit = async () => {
     try {
       const response = await getCoordinateData({ from, to });
+      setApiResponse(response);
       console.log('Response from API:', response);
     } catch (error) {
       console.error('Error:', error);
@@ -60,7 +63,7 @@ export default function Home() {
             </div>
           </div>
           
-          <Map from={from} to={to} />
+          <Map from={from} to={to} apiResponse={apiResponse} />
           
           <Directions
             directions={[
