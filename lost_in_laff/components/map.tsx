@@ -37,6 +37,13 @@ const MapWithNoSSR = dynamic(
 );
 
 const Map = ({ from, to, apiResponse }: MapProps) => {
+  const floorsSVG = {
+    0: "/maps/zero_output.svg",
+    1: "/maps/one_output.svg",
+    2: "/maps/two_output.svg",
+    3: "/maps/three_output.svg",
+  }
+
   // Placeholder svg file name
   const svgFileName = "zero_output.svg";
   const imageFileName = "zero.png";
@@ -51,7 +58,7 @@ const Map = ({ from, to, apiResponse }: MapProps) => {
         {from} {to}
       </div>
       <div className="w-full h-full">
-        <MapWithNoSSR from={from} to={to} apiResponse={apiResponse} svgFile={svgFilePath} imageFile={imageFilePath} />
+        <MapWithNoSSR from={from} to={to} apiResponse={apiResponse} svgFiles={floorsSVG} imageFile={imageFilePath} />
       </div>
     </div>
   );

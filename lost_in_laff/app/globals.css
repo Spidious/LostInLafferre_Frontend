@@ -35,3 +35,15 @@ body {
   #toMarker {
     filter: hue-rotate(145deg);
   }
+
+  .leaflet-vert-center {
+    position: absolute !important;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .leaflet-horiz-center {
+    position: absolute !important;
+    left: 50%;
+    transform: translateX(-50%);
+  }

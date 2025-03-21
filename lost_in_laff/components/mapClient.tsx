@@ -7,6 +7,8 @@ import {
   SVGOverlay,
   TileLayer,
   useMap,
+  LayersControl,
+  AttributionControl,
 } from "react-leaflet";
 import L, { svg } from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -16,9 +18,9 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 interface MapClientProps {
   from: string;
   to: string;
-  svgFile: any;
   imageFile: any;
   apiResponse?: string | null;
+  svgFiles: { [key: number]: string };
 }
 
 // Helper component to access the map instance and handle SVG interaction
@@ -157,15 +159,29 @@ function getRoomCoordsFromName(name: string): [number, number] | null {
   return [0, 0];
 }
 
-const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps) => {
-  const [svgSize, setSvgSize] = React.useState<[number, number] | null>(null);
+const MapClient = ({
+  from,
+  to,
+  svgFiles,
+  imageFile,
+  apiResponse,
+}: MapClientProps) => {
+  const [svgSizes, setSvgSizes] = React.useState<{[key: number]: [number, number]} | null>(null);
   const [svgElement, setSvgElement] = React.useState<SVGElement | null>(null);
+  const [svgElements, setSvgElements] = React.useState<{[key: number]: SVGElement | null} | null>(null);
   const [selectedArea, setSelectedArea] = React.useState<string>("");
+  const [floor, setFloor] = React.useState<number>(0);
 
   const [fromCoords, setFromCoords] = React.useState<[number, number] | null>(
     null
   );
   const [toCoords, setToCoords] = React.useState<[number, number] | null>(null);
+
+  React.useEffect(() => {
+    if (svgElements && svgElements[floor]) {
+      setSvgElement(svgElements[floor]);
+    }
+  }, [floor, svgElements]);
 
   const svgToMapCoords = (
     coords: [number, number],
@@ -173,8 +189,8 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
   ): [number, number] => {
     // Convert SVG coordinates to map coordinates
     if (svgElement) {
-      const svgHeight = svgSize ? svgSize[0] : 0;
-      const svgWidth = svgSize ? svgSize[1] : 0;
+      const svgHeight = svgSizes ? svgSizes[floor][0] : 0;
+      const svgWidth = svgSizes ? svgSizes[floor][1] : 0;
       const viewBox = svgElement
         .getAttribute("viewBox")
         ?.split(" ")
@@ -243,17 +259,36 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
   };
 
   React.useEffect(() => {
-    getImageAndSize(svgFile)
-      .then(([width, height, svgElement]) => {
-        setSvgSize([height, width]);
-        setSvgElement(svgElement);
-        console.log("SVG Size: ", [height, width]);
-        console.log("SVG Element: ", svgElement);
-      })
-      .catch((err) => {
-        console.error("Error loading SVG image:", err);
-      });
-  }, [svgFile]);
+    for (const key in svgFiles) {
+      getImageAndSize(svgFiles[key])
+        .then(([width, height, svgElement]) => {
+          setSvgSizes((prevSizes) => ({
+            ...prevSizes,
+            [key]: [height, width],
+          }));
+
+          setSvgElements((prevElements) => ({
+            ...prevElements,
+            [key]: svgElement,
+          }));
+        })
+        .catch((err) => {
+          console.error("Error loading SVG image:", err);
+        });
+    }
+  }, [svgFiles]);
+
+//     getImageAndSize(svgFiles[floor])
+//       .then(([width, height, svgElement]) => {
+//         setSvgSize([height, width]);
+//         setSvgElement(svgElement);
+//         console.log("SVG Size: ", [height, width]);
+//         console.log("SVG Element: ", svgElement);
+//       })
+//       .catch((err) => {
+//         console.error("Error loading SVG image:", err);
+//       });
+//   }, [svgFiles]);
 
   const recolorSVG = (
     svgElement: SVGElement | null,
@@ -326,7 +361,7 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
     }
   }, [from, to]);
 
-  if (!svgSize && !svgElement) {
+  if (!svgSizes || Object.keys(svgSizes).length < Object.keys(svgFiles).length || !svgElement) {
     return null;
   }
 
@@ -377,10 +412,20 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
   console.log("PNG Offset: ", pngOffset);
   console.log("Sanity Check", pngOffset[0] / pngOffset[1]);
 
+//   const svgBounds: L.LatLngBoundsLiteral = [
+//     [0, 0],
+//     [((svgSizes && svgSizes[floor]) && svgSizes[floor][0] / 100) || 0, ((svgSizes && svgSizes[floor]) && svgSizes[floor][1] / 100) || 0],
+//   ];
   const svgBounds: L.LatLngBoundsLiteral = [
     [0, 0],
-    [(svgSize && svgSize[0] / 100) || 0, (svgSize && svgSize[1] / 100) || 0],
+    [
+      ((svgSizes && svgSizes[floor]) && svgSizes[floor][0] / 100) || 0,
+      ((svgSizes && svgSizes[floor]) && svgSizes[floor][1] / 100) || 0,
+    ],
   ];
+
+  console.log("SVG Bounds: ", svgBounds);
+  console.log("SVG Size: ", svgSizes);
 
   const pngBounds = [
     [pngOffset[0] / 100, pngOffset[1] / 100],
@@ -409,7 +454,7 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
     ] as L.LatLngTuple,
   ];
 
-  const zoomFactor = -0.3;
+  const zoomFactor = 0;
   const zoomBounds = [
     [-zoomFactor * atomicUnit[0], -zoomFactor * atomicUnit[1]],
     [
@@ -418,7 +463,16 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
     ],
   ];
 
+    console.log("Zoom Bounds: ", zoomBounds);
+
   //   setFromCoords(center as [number, number]);
+
+  // Force Reload on Fast Refresh
+  // FOR DEVELOPMENT ONLY
+  // This is a workaround for the issue where the map does not refresh properly on fast refresh in development mode.
+  if (window.innerWidth > document.documentElement.clientWidth) {
+    window.location.reload();
+  }
 
   return (
     <MapContainer
@@ -426,7 +480,7 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
       maxBounds={maxBounds}
       maxBoundsViscosity={1.0}
       minZoom={2} // Set max zoom out
-      center={center}
+      center={center} // Set initial center
       //   zoom={3}
       bounds={zoomBounds as L.LatLngBoundsLiteral}
     >
@@ -493,10 +547,41 @@ const MapClient = ({ from, to, svgFile, imageFile, apiResponse }: MapClientProps
           style={{ margin: "10px", padding: "8px", display: "block" }}
         >
           <span id="response">
-            {apiResponse ? ("Response: " + apiResponse) : "Submit to see API response"}
+            {apiResponse
+              ? "Response: " + apiResponse
+              : "Submit to see API response"}
           </span>
         </div>
       </div>
+
+      <div className="leaflet-top leaflet-horiz-center">
+        <div
+          className="leaflet-control leaflet-bar p-2 bg-white shadow-md rounded-md"
+          style={{ margin: "10px", padding: "8px", display: "block" }}
+        >
+          <span id="response">Floor Number: {floor}</span>
+        </div>
+      </div>
+
+      <div className="leaflet-bar leaflet-control leaflet-right leaflet-vert-center"
+          style={{ margin: "10px", display: "block", background: "white" }}>
+        {[0, 1, 2, 3].map((floorNumber) => (
+          <a
+            key={floorNumber}
+            style={{
+              backgroundColor: floor == floorNumber ? '#c0c0c0' : '',
+            }}
+            href="#"
+            title={`Go to floor ${floorNumber}`}
+            role="button"
+            aria-label={`Go to floor ${floorNumber}`}
+            aria-disabled={floor === floorNumber}
+            onClick={() => setFloor(floorNumber)}
+          >
+            <span aria-hidden="true">{floorNumber.toString()}</span>
+          </a>
+        ))}
+        </div>
     </MapContainer>
   );
 };
