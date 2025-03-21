@@ -470,9 +470,9 @@ const MapClient = ({
   // Force Reload on Fast Refresh
   // FOR DEVELOPMENT ONLY
   // This is a workaround for the issue where the map does not refresh properly on fast refresh in development mode.
-  if (window.innerWidth > document.documentElement.clientWidth) {
-    window.location.reload();
-  }
+//   if (window.innerWidth > document.documentElement.clientWidth) {
+//     window.location.reload();
+//   }
 
   return (
     <MapContainer
