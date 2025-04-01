@@ -489,7 +489,7 @@ const MapClient = ({
           <svg
             width="100%"
             height="100%"
-            viewBox={svgElement.getAttribute("viewBox") || "0 0 100 100"}
+            viewBox={svgElement.getAttribute("viewBox") || `0 0 ${svgSizes[floor][1]} ${svgSizes[floor][0]}`}
             dangerouslySetInnerHTML={{ __html: svgElement.innerHTML }}
           />
         )}
