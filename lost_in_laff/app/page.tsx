@@ -25,7 +25,7 @@ export default function Home() {
 
   const roomOptions = Object.entries(floors).flatMap(([floorName, floorData]) =>
     Object.entries(floorData).map(([room, aliases]) => ({
-    value: room,
+    value: `${floorName}-${room}`,
     label: `${room} ${aliases ? `(${aliases.split(',')})` : ''}`
   }))
 );

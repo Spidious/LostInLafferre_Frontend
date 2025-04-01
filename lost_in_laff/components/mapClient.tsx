@@ -18,9 +18,15 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 interface MapClientProps {
   from: string;
   to: string;
-  imageFile: any;
   apiResponse?: string | null;
   svgFiles: { [key: number]: string };
+}
+
+const mapConverter: { [key: string]: number } = {
+  "basement": 0,
+  "firstLevel": 1,
+  "secondLevel": 2,
+  "thirdLevel": 3,
 }
 
 // Helper component to access the map instance and handle SVG interaction
@@ -107,32 +113,41 @@ function SVGInteractionHandler({
 function AutoPanToMarker({
   position,
   zoom = 4,
+  floorNumber,
+  floorUpdater,
 }: {
   position: [number, number] | null;
   zoom?: number;
+  floorNumber?: number;
+  floorUpdater: (floorNumber: number) => void;
 }) {
   const map = useMap();
 
   useEffect(() => {
-    if (position) {
-      console.log("Panning to:", position);
+      console.log("Panning to:", position, "on floor:", floorNumber);
+    if (position != null && floorNumber != null) {
+      console.log("Panning to success:", position, "on floor:", floorNumber);
+      floorUpdater(floorNumber);
       map.setView(position, zoom, {
         animate: true,
         duration: 0.5,
       });
     }
-  }, [position, map, zoom]);
+  }, [position, zoom, floorNumber]);
 
   return null;
 }
 
-function getRoomCoordsFromName(name: string): [number, number] | null {
-  // Find the SVG overlay container
-  const overlayContainer = document.querySelector(".leaflet-overlay-pane");
-  if (!overlayContainer) return null;
+function getRoomCoordsFromName(name: string, svg: SVGElement | null): [number, number] | null {
+  // // Find the SVG overlay container
+  // const overlayContainer = document.querySelector(".leaflet-overlay-pane");
+  // if (!overlayContainer) return null;
 
-  // Set up mutation observer to detect when SVG elements are added to the DOM
-  const svgElement = overlayContainer.querySelector("svg");
+  // // Set up mutation observer to detect when SVG elements are added to the DOM
+  // const svgElement = overlayContainer.querySelector("svg");
+
+  const svgElement = svg;
+
   if (svgElement) {
     // Find all interactive elements in the SVG
     const interactiveElements = svgElement.querySelectorAll("text");
@@ -163,7 +178,6 @@ const MapClient = ({
   from,
   to,
   svgFiles,
-  imageFile,
   apiResponse,
 }: MapClientProps) => {
   const [svgSizes, setSvgSizes] = React.useState<{[key: number]: [number, number]} | null>(null);
@@ -292,12 +306,15 @@ const MapClient = ({
 
   const recolorSVG = (
     svgElement: SVGElement | null,
-    from: string,
-    to: string
+    fromFull: string,
+    toFull: string
   ) => {
     if (!svgElement) return;
     svgElement.querySelectorAll("#Space polygon").forEach((polygon) => {
       const name = polygon.getAttribute("data-name") || "Unknown area";
+
+      const from = fromFull.split("-")[1];
+      const to = toFull.split("-")[1];
 
       if (name == to || name == from) {
         polygon.setAttribute(
@@ -315,6 +332,9 @@ const MapClient = ({
     svgElement.querySelectorAll("#text text").forEach((polygon) => {
       const name = polygon.innerHTML || "Unknown area";
 
+      const from = fromFull.split("-")[1];
+      const to = toFull.split("-")[1];
+      
       if (name == to || name == from) {
         polygon.setAttribute(
           "style",
@@ -337,7 +357,10 @@ const MapClient = ({
     recolorSVG(svgElement, from, to);
 
     if (from) {
-      const newFromCoords = getRoomCoordsFromName(from);
+      const floorIndex = mapConverter[from.split("-")[0]];
+      const roomName = from.split("-")[1];
+      const svg = svgElements ? svgElements[floorIndex] : null;
+      const newFromCoords = getRoomCoordsFromName(roomName, svg);
       console.log("New From Coords: ", newFromCoords);
       const normalizedFromCoords = svgToMapCoords(
         newFromCoords || [0, 0],
@@ -349,7 +372,10 @@ const MapClient = ({
     }
 
     if (to) {
-      const newToCoords = getRoomCoordsFromName(to);
+      const floorIndex = mapConverter[to.split("-")[0]];
+      const roomName = to.split("-")[1];
+      const svg = svgElements ? svgElements[floorIndex] : null;
+      const newToCoords = getRoomCoordsFromName(roomName, svg);
       console.log("New To Coords: ", newToCoords);
       const normalizedToCoords = svgToMapCoords(
         newToCoords || [0, 0],
@@ -498,7 +524,7 @@ const MapClient = ({
       {/* <SVGInteractionHandler
       onAreaClick={setSelectedArea} /> */}
 
-      {fromCoords && (
+      {fromCoords && (mapConverter[from.split("-")[0]] == floor) && (
         <Marker
           position={fromCoords}
           icon={
@@ -518,7 +544,7 @@ const MapClient = ({
         </Marker>
       )}
 
-      {toCoords && (
+      {toCoords && (mapConverter[to.split("-")[0]] == floor) && (
         <Marker
           position={toCoords}
           icon={
@@ -538,8 +564,8 @@ const MapClient = ({
         </Marker>
       )}
 
-      <AutoPanToMarker position={fromCoords} zoom={7} />
-      <AutoPanToMarker position={toCoords} zoom={7} />
+      <AutoPanToMarker floorUpdater={setFloor} floorNumber={mapConverter[from.split("-")[0]]} position={fromCoords} zoom={7} />
+      <AutoPanToMarker floorUpdater={setFloor} floorNumber={mapConverter[to.split("-")[0]]} position={toCoords} zoom={7} />
 
       <div className="leaflet-bottom leaflet-left">
         <div
