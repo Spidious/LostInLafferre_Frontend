@@ -40,8 +40,8 @@ const Map = ({ from, to, apiResponse }: MapProps) => {
   const floorsSVG = {
     0: "/maps/zero_frontend.svg",
     1: "/maps/one_frontend.svg",
-    2: "/maps/old/two_output.svg",
-    3: "/maps/old/three_output.svg",
+    2: "/maps/two_frontend.svg",
+    3: "/maps/three_frontend.svg",
   }
 
   return (
