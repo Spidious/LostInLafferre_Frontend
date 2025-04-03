@@ -9,6 +9,7 @@ import basement from '@/floors/basement.json';
 import firstLevel from '@/floors/firstLevel.json';
 import secondLevel from '@/floors/secondLevel.json';
 import thirdLevel from '@/floors/thirdLevel.json';
+import entrances from '@/floors/entrances.json';
 
 export default function Home() {
   const [from, setFrom] = useState('');
@@ -17,6 +18,7 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState(null);
 
   const floors = {
+    entrances,
     basement,
     firstLevel,
     secondLevel,
