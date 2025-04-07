@@ -9,12 +9,16 @@ import basement from '@/floors/basement.json';
 import firstLevel from '@/floors/firstLevel.json';
 import secondLevel from '@/floors/secondLevel.json';
 import thirdLevel from '@/floors/thirdLevel.json';
+import entrances from '@/floors/entrances.json';
 
 export default function Home() {
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
 
+  const [apiResponse, setApiResponse] = useState(null);
+
   const floors = {
+    entrances,
     basement,
     firstLevel,
     secondLevel,
@@ -23,7 +27,7 @@ export default function Home() {
 
   const roomOptions = Object.entries(floors).flatMap(([floorName, floorData]) =>
     Object.entries(floorData).map(([room, aliases]) => ({
-    value: room,
+    value: `${floorName}-${room}`,
     label: `${room} ${aliases ? `(${aliases.split(',')})` : ''}`
   }))
 );
@@ -31,6 +35,7 @@ export default function Home() {
   const handleSubmit = async () => {
     try {
       const response = await getCoordinateData({ from, to });
+      setApiResponse(response);
       console.log('Response from API:', response);
     } catch (error) {
       console.error('Error:', error);
@@ -60,7 +65,7 @@ export default function Home() {
             </div>
           </div>
           
-          <Map from={from} to={to} />
+          <Map from={from} to={to} apiResponse={apiResponse} />
           
           <Directions
             directions={[
