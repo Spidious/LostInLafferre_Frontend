@@ -1,16 +1,12 @@
-import React, { use, useEffect, useRef } from "react";
+import React, { useEffect } from "react";
 import {
   MapContainer,
   Marker,
   Popup,
-  ImageOverlay,
   SVGOverlay,
-  TileLayer,
-  useMap,
-  LayersControl,
-  AttributionControl,
+  useMap
 } from "react-leaflet";
-import L, { svg } from "leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
@@ -29,85 +25,85 @@ const mapConverter: { [key: string]: number } = {
   "thirdLevel": 3,
 }
 
-// Helper component to access the map instance and handle SVG interaction
-function SVGInteractionHandler({
-  onAreaClick,
-}: {
-  onAreaClick: (name: string) => void;
-}) {
-  const map = useMap();
-  const overlayRef = useRef<HTMLDivElement | null>(null);
+// // Helper component to access the map instance and handle SVG interaction
+// function SVGInteractionHandler({
+//   onAreaClick,
+// }: {
+//   onAreaClick: (name: string) => void;
+// }) {
+//   const map = useMap();
+//   const overlayRef = useRef<HTMLDivElement | null>(null);
 
-  React.useEffect(() => {
-    // Find the SVG overlay container
-    const overlayContainer = document.querySelector(".leaflet-overlay-pane");
-    if (!overlayContainer) return;
+//   React.useEffect(() => {
+//     // Find the SVG overlay container
+//     const overlayContainer = document.querySelector(".leaflet-overlay-pane");
+//     if (!overlayContainer) return;
 
-    // Set up mutation observer to detect when SVG elements are added to the DOM
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        if (mutation.type === "childList" && mutation.addedNodes.length) {
-          const svgElement = overlayContainer.querySelector("svg");
-          if (svgElement) {
-            // Find all interactive elements in the SVG
-            const interactiveElements = svgElement.querySelectorAll(
-              "polygon, path, text, g"
-            );
+//     // Set up mutation observer to detect when SVG elements are added to the DOM
+//     const observer = new MutationObserver((mutations) => {
+//       mutations.forEach((mutation) => {
+//         if (mutation.type === "childList" && mutation.addedNodes.length) {
+//           const svgElement = overlayContainer.querySelector("svg");
+//           if (svgElement) {
+//             // Find all interactive elements in the SVG
+//             const interactiveElements = svgElement.querySelectorAll(
+//               "polygon, path, text, g"
+//             );
 
-            interactiveElements.forEach((element) => {
-              // Add pointer cursor
-              element.setAttribute(
-                "style",
-                `${element.getAttribute("style") || ""} cursor: pointer;`
-              );
+//             interactiveElements.forEach((element) => {
+//               // Add pointer cursor
+//               element.setAttribute(
+//                 "style",
+//                 `${element.getAttribute("style") || ""} cursor: pointer;`
+//               );
 
-              // Remove any existing click handlers to prevent duplicates
-              element.removeEventListener("click", handleElementClick);
+//               // Remove any existing click handlers to prevent duplicates
+//               element.removeEventListener("click", handleElementClick);
 
-              // Add click handler
-              element.addEventListener("click", handleElementClick);
-            });
-          }
-        }
-      });
-    });
+//               // Add click handler
+//               element.addEventListener("click", handleElementClick);
+//             });
+//           }
+//         }
+//       });
+//     });
 
-    // Function to handle element clicks
-    function handleElementClick(e: Event) {
-      e.stopPropagation();
-      const target = e.target as SVGElement;
-      console.log("SVG element clicked:", target);
+//     // Function to handle element clicks
+//     function handleElementClick(e: Event) {
+//       e.stopPropagation();
+//       const target = e.target as SVGElement;
+//       console.log("SVG element clicked:", target);
 
-      const name =
-        target.id ||
-        target.getAttribute("data-name") ||
-        target.getAttribute("name") ||
-        target.textContent?.trim() ||
-        "Unknown area";
+//       const name =
+//         target.id ||
+//         target.getAttribute("data-name") ||
+//         target.getAttribute("name") ||
+//         target.textContent?.trim() ||
+//         "Unknown area";
 
-      onAreaClick(name);
-    }
+//       onAreaClick(name);
+//     }
 
-    // Start observing
-    observer.observe(overlayContainer, { childList: true, subtree: true });
+//     // Start observing
+//     observer.observe(overlayContainer, { childList: true, subtree: true });
 
-    // Cleanup
-    return () => {
-      observer.disconnect();
-      const svgElement = overlayContainer.querySelector("svg");
-      if (svgElement) {
-        const interactiveElements = svgElement.querySelectorAll(
-          "polygon, path, text, g"
-        );
-        interactiveElements.forEach((element) => {
-          element.removeEventListener("click", handleElementClick);
-        });
-      }
-    };
-  }, [map, onAreaClick]);
+//     // Cleanup
+//     return () => {
+//       observer.disconnect();
+//       const svgElement = overlayContainer.querySelector("svg");
+//       if (svgElement) {
+//         const interactiveElements = svgElement.querySelectorAll(
+//           "polygon, path, text, g"
+//         );
+//         interactiveElements.forEach((element) => {
+//           element.removeEventListener("click", handleElementClick);
+//         });
+//       }
+//     };
+//   }, [map, onAreaClick]);
 
-  return null;
-}
+//   return null;
+// }
 
 // Helper component to automatically pan to new coordinates
 function AutoPanToMarker({
@@ -183,7 +179,7 @@ const MapClient = ({
   const [svgSizes, setSvgSizes] = React.useState<{[key: number]: [number, number]} | null>(null);
   const [svgElement, setSvgElement] = React.useState<SVGElement | null>(null);
   const [svgElements, setSvgElements] = React.useState<{[key: number]: SVGElement | null} | null>(null);
-  const [selectedArea, setSelectedArea] = React.useState<string>("");
+  // const [selectedArea, setSelectedArea] = React.useState<string>("");
   const [floor, setFloor] = React.useState<number>(0);
 
   const [fromCoords, setFromCoords] = React.useState<[number, number] | null>(
@@ -205,10 +201,10 @@ const MapClient = ({
     if (svgElement) {
       const svgHeight = svgSizes ? svgSizes[floor][0] : 0;
       const svgWidth = svgSizes ? svgSizes[floor][1] : 0;
-      const viewBox = svgElement
-        .getAttribute("viewBox")
-        ?.split(" ")
-        .map(Number) || [0, 0, svgWidth, svgHeight];
+      // const viewBox = svgElement
+      //   .getAttribute("viewBox")
+      //   ?.split(" ")
+      //   .map(Number) || [0, 0, svgWidth, svgHeight];
 
       // Normalize coordinates based on viewBox
       const normalizedY = ((coords[0] / svgHeight) * svgHeight) / 100; // Divide by 10 to match your map scaling
@@ -220,15 +216,15 @@ const MapClient = ({
     return [0, 0];
   };
 
-  const mapToSVGCoords = (
-    coords: [number, number],
-    svgElement: SVGElement
-  ): [number, number] => {
-    return [
-      (coords[0] / svgElement.clientWidth) * 10,
-      (coords[1] / svgElement.clientHeight) * 10,
-    ];
-  };
+  // const mapToSVGCoords = (
+  //   coords: [number, number],
+  //   svgElement: SVGElement
+  // ): [number, number] => {
+  //   return [
+  //     (coords[0] / svgElement.clientWidth) * 10,
+  //     (coords[1] / svgElement.clientHeight) * 10,
+  //   ];
+  // };
 
   const getImageAndSize = (
     url: string
@@ -400,21 +396,21 @@ const MapClient = ({
   console.log("New To Map coords:", coords);
   console.log("Wanted Coords: ", [3.43, 1.649]);
 
-  const pngSize = [718, 930];
+  // const pngSize = [718, 930];
 
   //   console.log("SVG Size: ", svgSize);
   //   console.log("PNG Size: ", pngSize);
   //   console.log("Sanity Check", pngSize[0] / pngSize[1]);
 
-  // Fix scale difference between svg and png
-  const svgUnit = [333, 300];
-  const pngUnit = [75, 67];
-  const pngRescale = [svgUnit[0] / pngUnit[0], svgUnit[1] / pngUnit[1]];
+  // // Fix scale difference between svg and png
+  // const svgUnit = [333, 300];
+  // const pngUnit = [75, 67];
+  // const pngRescale = [svgUnit[0] / pngUnit[0], svgUnit[1] / pngUnit[1]];
 
-  const pngSizeRescaled = [
-    pngSize[0] * pngRescale[0],
-    pngSize[1] * pngRescale[1],
-  ];
+  // const pngSizeRescaled = [
+  //   pngSize[0] * pngRescale[0],
+  //   pngSize[1] * pngRescale[1],
+  // ];
 
   //   console.log("Rescale Factor: ", pngRescale);
   //   console.log("Rescaled PNG Size: ", pngSizeRescaled);
@@ -453,13 +449,13 @@ const MapClient = ({
   console.log("SVG Bounds: ", svgBounds);
   console.log("SVG Size: ", svgSizes);
 
-  const pngBounds = [
-    [pngOffset[0] / 100, pngOffset[1] / 100],
-    [
-      (pngOffset[0] + pngSizeRescaled[0]) / 100,
-      (pngOffset[1] + pngSizeRescaled[1]) / 100,
-    ],
-  ];
+  // const pngBounds = [
+  //   [pngOffset[0] / 100, pngOffset[1] / 100],
+  //   [
+  //     (pngOffset[0] + pngSizeRescaled[0]) / 100,
+  //     (pngOffset[1] + pngSizeRescaled[1]) / 100,
+  //   ],
+  // ];
 
   //   console.log("SVG Bounds: ", svgBounds);
   //   console.log("PNG Bounds: ", pngBounds);
