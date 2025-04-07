@@ -2,11 +2,15 @@ export const fetchMockPath = async (): Promise<[number, number][]> => {
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve([
-          [162, 572], // Start point 
-          [188, 572],
-        //   [38.9468, -92.3293], // Midpoint
-        //   [38.9470, -92.3296],
-        //   [38.9473, -92.3299]  // End point 
+          [162, 572], //Start Point
+          [220, 572],
+          [218, 500], // Turn and start going down hallway
+          [215, 480],
+          // [220, 472],
+          [223, 460], // Turn and start going down another hallway
+          [200, 455],
+          [190, 457],
+          [165, 455]
         ]);
       }, 1000); // Simulates network delay
     });
