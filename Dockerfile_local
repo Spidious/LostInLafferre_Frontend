@@ -19,4 +19,4 @@ EXPOSE 3000
 RUN npm install 
 # RUN npm run build
 
-CMD ["/bin/sh", "-c", "nodemon --watch . --ext js,json,css,tsx,ts --exec 'npm run dev'"]
+CMD ["npm", "run", "dev"]

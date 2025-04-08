@@ -48,7 +48,6 @@ services:
       - "3000:3000"
     restart: no
     volumes:
-      - ./lost_in_laff:/app/lost_in_laff
-    user: "${UID}:${GID}"
+      - ${PWD}/lost_in_laff:/app/lost_in_laff
     profiles:
       - local
