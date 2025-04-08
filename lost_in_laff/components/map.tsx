@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 interface MapProps {
   from: string;
   to: string;
-  apiResponse?: string | null;
+  apiResponse?: Object | null;
 }
 
 // Dynamically import the map component with SSR disabled

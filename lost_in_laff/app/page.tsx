@@ -34,7 +34,9 @@ export default function Home() {
 
   const handleSubmit = async () => {
     try {
-      const response = await getCoordinateData({ from, to });
+    const toRoomName = to.split("-")[1];
+    const fromRoomName = from.split("-")[1];
+      const response = await getCoordinateData({ from: fromRoomName, to: toRoomName });
       setApiResponse(response);
       console.log('Response from API:', response);
     } catch (error) {

@@ -10,13 +10,13 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
  * @interface MapClientProps
  * @property {string} from - Starting location/room number. Format: "floor-room" (e.g., "basement-C0003")
  * @property {string} to - Destination location/room number. Format: "floor-room" (e.g., "firstLevel-C001")
- * @property {string | null} [apiResponse] - Optional response from the API containing path data
+ * @property {Object | null} [apiResponse] - Optional response from the API containing path data
  * @property {{ [key: number]: string }} svgFiles - SVG files for each floor
  */
 interface MapClientProps {
   from: string;
   to: string;
-  apiResponse?: string | null;
+  apiResponse?: Object | null;
   svgFiles: { [key: number]: string };
 }
 
@@ -159,6 +159,11 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
   // State variable that holds the coordinates of the destination location
   const [toCoords, setToCoords] = React.useState<[number, number] | null>(null);
 
+  // State variable for pathElements of each floor
+  const [pathElements, setPathElements] = React.useState<{
+    [key: number]: SVGElement | null;
+  } | null>(null);
+
   // TODO: Combine state variables for floor number and svgElements
   // Effect to update the SVG element when the floor changes
   React.useEffect(() => {
@@ -288,6 +293,81 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
         });
     }
   }, [svgFiles]);
+
+  // useEffect to generate path from response when apiResponse changed
+  React.useEffect(() =>{
+    // If response found
+    if (apiResponse) {
+      try {
+        // Get all of the coords from the apiResponse
+        // The form of a coordinate is {index: {x: coord, y: coord, z:coord}}
+        const coords: {[index: number]: {x: number, y: number, z: number}} = apiResponse as {[index: number]: {x: number, y: number, z: number}};
+
+        // Create a new object to hold the path elements for each floor
+        const newPathElements: {[key: number]: SVGElement} = {};
+
+        // Loop through each floor
+        for (let floor = 0; floor <= 3; floor++) {
+          // Create a svg element to hold path elements
+          const pathSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+          
+          // Only look at the coords for that floor
+          // Verticality has a weight of 50 so floor 0 = z: 0, floor 1 = z: 50, ...
+          // Group consecutive coordinates
+          const groups: Array<Array<{x: number, y: number, z: number}>> = [];
+          let currentGroup: Array<{x: number, y: number, z: number}> = [];
+
+          Object.values(coords).forEach((coord, index) => {
+            // Skip wrong floor coords
+            if (coord.z !== floor * 50) return;
+
+            // If first coordinate of floor or same z as previous coordinate, add to current group
+            if (index === 0 || coord.z === coords[index - 1].z) {
+              currentGroup.push(coord);
+            } else {
+              // Else push current group and start a new one
+              groups.push([...currentGroup]);
+              currentGroup = [coord];
+            }
+          });
+
+          // If last currentGroup had coords then push it to groups
+          if (currentGroup.length > 0) {
+            groups.push(currentGroup);
+          }
+
+          // Create polyline or circle for each group
+          groups.forEach(group => {
+            if (group.length === 1) {
+              // Create circle for single point
+              const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+              circle.setAttribute("cx", group[0].x.toString());
+              circle.setAttribute("cy", group[0].y.toString());
+              circle.setAttribute("r", "3"); // radius of 3 units
+              circle.setAttribute("style", "fill:red;stroke:none");
+              pathSvg.appendChild(circle);
+            } else {
+              // Create polyline for multiple points
+              const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+              const points = group.map(point => `${point.x},${point.y}`).join(" ");
+              polyline.setAttribute("points", points);
+              polyline.setAttribute("style", "fill:none;stroke:red;stroke-width:3");
+              pathSvg.appendChild(polyline);
+            }
+          });
+
+          // Set the pathElement for that floor to the newPathElements
+          newPathElements[floor] = pathSvg;
+        }
+
+        // Update the pathElements
+        setPathElements(newPathElements);
+      } catch (error) {
+        console.error("Error parsing API response:", error);
+      }
+    }
+
+  }, [apiResponse]);
 
   /**
    * @description Recolors the Room Name and Floor SVG elements to "selected" colors if they match the from or to values
@@ -517,6 +597,27 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
         )}
       </SVGOverlay>
 
+      {/* SVGOverlay component for the path */}
+      {/* This overlay displays the path on the map */}
+      {/* The opacity is set to 0.5 to make it semi-transparent */}
+      {/* The interactive prop is set to false to disable interactivity */}
+      <SVGOverlay bounds={svgBounds} opacity={0.5} interactive={false}>
+        {/* Render the path element inside the SVGOverlay */}
+        {/* The viewBox is set to the current SVG element's viewBox or the default size */}
+        {/* The dangerouslySetInnerHTML prop is used to set the generated path element */}
+        {pathElements && pathElements[floor] && (
+          <svg
+            width="100%"
+            height="100%"
+            viewBox={
+              svgElement.getAttribute("viewBox") ||
+              `0 0 ${svgSizes[floor][1]} ${svgSizes[floor][0]}`
+            }
+            dangerouslySetInnerHTML={{ __html: pathElements[floor].innerHTML }}
+          />
+        )}
+      </SVGOverlay>
+
       {/* Markers for the starting and destination locations */}
       {/* These markers are displayed on the map at the coordinates of the from and to locations */}
       {/* The markers are only displayed if the coordinates are valid and the floor matches */}
@@ -596,7 +697,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
         >
           <span id="response">
             {apiResponse
-              ? "Response: " + apiResponse
+              ? "Response had " + Object.keys(apiResponse).length + " points"
               : "Submit to see API response"}
           </span>
         </div>
