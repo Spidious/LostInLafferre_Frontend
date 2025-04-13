@@ -16,7 +16,7 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 interface MapClientProps {
   from: string;
   to: string;
-  apiResponse?: Object | null;
+  apiResponse?: object | null;
   svgFiles: { [key: number]: string };
 }
 
