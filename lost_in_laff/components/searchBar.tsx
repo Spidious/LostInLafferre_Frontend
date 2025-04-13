@@ -42,22 +42,26 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
 
   return (
     // The Command component is used to create a command palette UI
-    <Command className="rounded-lg border shadow-md md:min-w-[450px]">
+    <Command className="w-full rounded-xl border border-emerald-200 shadow-lg bg-white text-sm focus-within:ring-2 focus-within:ring-emerald-400 transition-all duration-200 md:w-[450px] min-w-[300px]">
        {/* The CommandInput component is used to create an input field for the search bar */}
-        <CommandInput 
-        value={value}
-        onValueChange={onChange}
-        placeholder={placeholder}
-        onClick={handleInputClick}
-        />
+       <div onClick={handleInputClick}>
+          <CommandInput 
+          value={value}
+          onValueChange={onChange}
+          placeholder={placeholder}
+          onClick={handleInputClick}
+          className='w-full bg-transparent text-base placeholder-gray-400 focus:outline-none'
+          />
+        </div>
         {/* The CommandList component is used to display a drop down list for all the possible rooms. 
         This will only render when the list view is set to visible after the search bar is clicked  */}
         {isListVisible && (
-        <CommandList>
+        <CommandList className='max-h-60 overflow-auto rounded-b-xl border-t border-gray-100 bg-white'>
           {/* Group the rooms together under a section header called 'Suggestions' */}
           <CommandGroup heading="Suggestions">
             {options.map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}>
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}
+              className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
               </CommandItem>
             ))}
