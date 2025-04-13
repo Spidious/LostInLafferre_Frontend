@@ -10,6 +10,13 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) => {
+  const groupedOptions: Record<string, typeof options> = {
+    basement: [],
+    firstLevel: [],
+    secondLevel: [],
+    thirdLevel: [],
+    entrances: []
+  };
   const [isListVisible, setIsListVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(false); // Handels the SSR mismatch issue
 
@@ -25,11 +32,31 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
 
   // This function handles the selection of an option from the drop down list
   // It updates the placeholder and calls the onChange function with the selected value along with closing the drop down
-  const handleSelect = (selectedValue: string) => {
-    placeholder = selectedValue;
-    onChange(selectedValue);
+  const handleSelect = (showedValue: string, setValue: string) => {
+    placeholder = showedValue;
+    onChange(setValue);
     setIsListVisible(false);
   }
+  
+  options.forEach(option => {
+    switch (true) {
+      case option.value.startsWith('basement'):
+        groupedOptions.basement.push(option);
+        break;
+      case option.value.startsWith('firstLevel'):
+        groupedOptions.firstLevel.push(option);
+        break;
+      case option.value.startsWith('secondLevel'):
+        groupedOptions.secondLevel.push(option);
+        break;
+      case option.value.startsWith('thirdLevel'):
+        groupedOptions.thirdLevel.push(option);
+        break;
+      default:
+        groupedOptions.entrances.push(option);
+        break;
+    }
+  });
 
   // This effect is used to set the mounted state to true after the component has been rendered
   useEffect(() => {
@@ -55,9 +82,37 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
         {isListVisible && (
         <CommandList>
           {/* Group the rooms together under a section header called 'Suggestions' */}
-          <CommandGroup heading="Suggestions">
-            {options.map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}>
+          <CommandGroup heading="entrences">
+            {(groupedOptions.entrances).map((option) => (
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}>
+                {option.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="Basement">
+            {(groupedOptions.basement).map((option) => (
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}>
+                {option.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="First Floor">
+            {(groupedOptions.firstLevel).map((option) => (
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}>
+                {option.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="Second Floor">
+            {(groupedOptions.secondLevel).map((option) => (
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}>
+                {option.label}
+              </CommandItem>
+            ))}
+          </CommandGroup>
+          <CommandGroup heading="Third Level">
+            {(groupedOptions.thirdLevel).map((option) => (
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}>
                 {option.label}
               </CommandItem>
             ))}

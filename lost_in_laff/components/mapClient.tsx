@@ -191,47 +191,47 @@ const MapClient = ({
 
   const [pathCoords, setPathCoords] = React.useState<[number, number][]>([]);
 
-  //This is the code for when the API will have a valid coordinate response
-  // React.useEffect(() => {
-  //   if (apiResponse && svgElement) {
-  //     try {
-  //       const parsedResponse = JSON.parse(apiResponse);
-  //       if (parsedResponse.path) {
-  //         const convertedPath = parsedResponse.path.map((coord: [number, number]) =>
-  //           svgToMapCoords(coord, svgElement)
-  //         );
-  //         setPathCoords(convertedPath);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error parsing API response:", error);
-  //     }
-  //   }
-  // }, [apiResponse, svgElement]);  
-
+  // This is the code for when the API will have a valid coordinate response
   React.useEffect(() => {
-    const loadMockData = async () => {
-      console.log("Entered Here")
+    if (apiResponse && svgElement) {
       try {
-        const mockPath = await fetchMockPath(); // Fetch mock coordinates
-        const mockApiResponse = JSON.stringify({ path: mockPath }); // Simulate API response
-        
-        if (mockApiResponse && svgElement) {
-          const parsedResponse = JSON.parse(mockApiResponse);
-          if (parsedResponse.path) {
-            const convertedPath = parsedResponse.path.map((coord: [number, number]) =>
-              svgToMapCoords(coord, svgElement)
-            );
-            setPathCoords(convertedPath);
-            console.log("Path coords: ", pathCoords)
-          }
+        const parsedResponse = JSON.parse(apiResponse);
+        if (parsedResponse.path) {
+          const convertedPath = parsedResponse.path.map((coord: [number, number]) =>
+            svgToMapCoords(coord, svgElement)
+          );
+          setPathCoords(convertedPath);
         }
       } catch (error) {
-        console.error("Error loading mock data:", error);
+        console.error("Error parsing API response:", error);
       }
-    };
+    }
+  }, [apiResponse, svgElement]);  
+
+  // React.useEffect(() => {
+  //   const loadMockData = async () => {
+  //     console.log("Entered Here")
+  //     try {
+  //       const mockPath = await fetchMockPath(); // Fetch mock coordinates
+  //       const mockApiResponse = JSON.stringify({ path: mockPath }); // Simulate API response
+        
+  //       if (mockApiResponse && svgElement) {
+  //         const parsedResponse = JSON.parse(mockApiResponse);
+  //         if (parsedResponse.path) {
+  //           const convertedPath = parsedResponse.path.map((coord: [number, number]) =>
+  //             svgToMapCoords(coord, svgElement)
+  //           );
+  //           setPathCoords(convertedPath);
+  //           console.log("Path coords: ", pathCoords)
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error("Error loading mock data:", error);
+  //     }
+  //   };
   
-    loadMockData();
-  }, [svgElement]); // Removed apiResponse since it's now internally handled
+  //   loadMockData();
+  // }, [svgElement]); // Removed apiResponse since it's now internally handled
 
   React.useEffect(() => {
     if (svgElements && svgElements[floor]) {

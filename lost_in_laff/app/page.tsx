@@ -10,6 +10,7 @@ import firstLevel from '@/floors/firstLevel.json';
 import secondLevel from '@/floors/secondLevel.json';
 import thirdLevel from '@/floors/thirdLevel.json';
 import entrances from '@/floors/entrances.json';
+import { split } from 'postcss/lib/list';
 
 export default function Home() {
   const [from, setFrom] = useState('');
@@ -34,7 +35,9 @@ export default function Home() {
 
   const handleSubmit = async () => {
     try {
-      const response = await getCoordinateData({ from, to });
+      const fromRoomName = from.split("-")[1]
+      const toRoomName = to.split("-")[1]
+      const response = await getCoordinateData({ from: fromRoomName, to: toRoomName });
       setApiResponse(response);
       console.log('Response from API:', response);
     } catch (error) {
