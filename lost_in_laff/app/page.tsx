@@ -10,6 +10,7 @@ import firstLevel from '@/floors/firstLevel.json';
 import secondLevel from '@/floors/secondLevel.json';
 import thirdLevel from '@/floors/thirdLevel.json';
 import entrances from '@/floors/entrances.json';
+import { split } from 'postcss/lib/list';
 
 export default function Home() {
   const [from, setFrom] = useState('');

@@ -4,6 +4,8 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
+import PolylinePath from "./polylinePath";
+import { fetchMockPath } from "./mockApi";
 
 /**
  * @description Props interface for the MapClient component
@@ -159,6 +161,50 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
   // State variable that holds the coordinates of the destination location
   const [toCoords, setToCoords] = React.useState<[number, number] | null>(null);
 
+  //const [pathCoords, setPathCoords] = React.useState<[number, number][]>([]);
+
+  // This is the code for when the API will have a valid coordinate response
+<!--   React.useEffect(() => {
+    if (apiResponse && svgElement) {
+      try {
+        const parsedResponse = JSON.parse(apiResponse);
+        if (parsedResponse.path) {
+          const convertedPath = parsedResponse.path.map((coord: [number, number]) =>
+            svgToMapCoords(coord, svgElement)
+          );
+          setPathCoords(convertedPath);
+        }
+      } catch (error) {
+        console.error("Error parsing API response:", error);
+      }
+    }
+  }, [apiResponse, svgElement]);   -->
+
+  // React.useEffect(() => {
+  //   const loadMockData = async () => {
+  //     console.log("Entered Here")
+  //     try {
+  //       const mockPath = await fetchMockPath(); // Fetch mock coordinates
+  //       const mockApiResponse = JSON.stringify({ path: mockPath }); // Simulate API response
+        
+  //       if (mockApiResponse && svgElement) {
+  //         const parsedResponse = JSON.parse(mockApiResponse);
+  //         if (parsedResponse.path) {
+  //           const convertedPath = parsedResponse.path.map((coord: [number, number]) =>
+  //             svgToMapCoords(coord, svgElement)
+  //           );
+  //           setPathCoords(convertedPath);
+  //           console.log("Path coords: ", pathCoords)
+  //         }
+  //       }
+  //     } catch (error) {
+  //       console.error("Error loading mock data:", error);
+  //     }
+  //   };
+  
+  //   loadMockData();
+  // }, [svgElement]); // Removed apiResponse since it's now internally handled
+    
   // State variable for pathElements of each floor
   const [pathElements, setPathElements] = React.useState<{
     [key: number]: SVGElement | null;
