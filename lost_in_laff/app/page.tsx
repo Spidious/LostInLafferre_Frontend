@@ -51,7 +51,7 @@ export default function Home() {
       <header className="w-full bg-white top-0 z-50 p-4 flex justify-center">
         <Image src={logo} alt="Lost in Lafferre" className='w-24 h-25'/>
       </header>
-      <main className="w-full max-w-lg mt-20 p-6 flex flex-col items-center space-y-6">
+      <main className="w-full max-w-lg mt-4 p-6 flex flex-col items-center space-y-6">
 
       {/* Search Bars */}
         <SearchBar
@@ -86,7 +86,6 @@ export default function Home() {
             ]}
           />
         </div>
-        
       </main>
     </div>
   );
