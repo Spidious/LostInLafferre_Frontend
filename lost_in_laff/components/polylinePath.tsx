@@ -50,7 +50,7 @@ const PolylinePath: React.FC<PolylinePathProps> = ({ apiResponse }) => {
   const displayPath = (
     convertedPath: [number, number, number][]
   ): [number, number][] => {
-    return convertedPath.map(([y, x, z]) => [x, y]); // convert to [x, y]
+    return convertedPath.map(([y, x]) => [x, y]); // convert to [x, y]
   };  
 
   console.log("converted path:", displayPath(convertedPath))

@@ -75,7 +75,6 @@ export default function Home() {
               'Walk straight for 20 meters',
               'Your destination W0014 will be on your left'
             ]}
-            apiResponse={apiResponse}
           />
         </div>
       </main>

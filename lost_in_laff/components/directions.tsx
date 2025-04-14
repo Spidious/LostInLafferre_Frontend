@@ -1,12 +1,10 @@
 import React from 'react';
-import PolylinePath from './polylinePath';
 
 interface DirectionsProps {
   directions: string[];
-  apiResponse?: object | null;
 }
 
-const Directions = ({ directions, apiResponse }: DirectionsProps) => {
+const Directions = ({ directions }: DirectionsProps) => {
   return (
     <div className="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-200">
       <h3 className="text-emerald-800 font-semibold mb-2">Directions</h3>
