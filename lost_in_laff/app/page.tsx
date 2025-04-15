@@ -10,6 +10,8 @@ import firstLevel from '@/floors/firstLevel.json';
 import secondLevel from '@/floors/secondLevel.json';
 import thirdLevel from '@/floors/thirdLevel.json';
 import entrances from '@/floors/entrances.json';
+import Image from 'next/image';
+import logo from '@/public/Lost In Lafferre Logo.png';
 
 export default function Home() {
   const [from, setFrom] = useState('');
@@ -45,30 +47,37 @@ export default function Home() {
   };
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="row-start-2 sm:items-start">
-        <div className="space-y-2">
-          <div className="space-y-2">
-            <SearchBar
-              value={from}
-              onChange={setFrom}
-              options={roomOptions}
-              placeholder="Select starting point"
-            />
-            <SearchBar
-              value={to}
-              onChange={setTo}
-              options={roomOptions}
-              placeholder="Select destination"
-            />
+    <div className="min-h-screen bg-gray-50 flex flex-col items-center">
+      <header className="w-full bg-white top-0 z-50 p-4 flex justify-center">
+        <Image src={logo} alt="Lost in Lafferre" className='w-24 h-25'/>
+      </header>
+      <main className="w-full max-w-lg mt-4 p-6 flex flex-col items-center space-y-6">
 
-            <div className="flex justify-center">
-              <button className="bg-emerald-50 rounded-lg p-1 border-2 border-emerald-200" onClick={handleSubmit}>Submit</button>
-            </div>
-          </div>
-          
+      {/* Search Bars */}
+        <SearchBar
+          value={from}
+          onChange={setFrom}
+          options={roomOptions}
+          placeholder="Select starting point"
+        />
+        <SearchBar
+          value={to}
+          onChange={setTo}
+          options={roomOptions}
+          placeholder="Select destination"
+        />
+
+        {/* Submit Button */}
+        <button className="w-1/3 max-w-xs px-6 mt-4 bg-emerald-600 text-white py-3 rounded-xl shadow-lg bg-gradient-to-r from-emerald-500 to-green-400 text-lg font-semibold transition-all duration-200 hover:scale-105 hover:from-emerald-600 hover:to-green-500 active:scale-100 active:brightness-90" onClick={handleSubmit}>Submit</button>
+
+
+        {/* Map Component */}
+        <div className='w-full h-[400px] rounded-lg overflow-hidden shadow-lg bg-white'>
           <Map from={from} to={to} apiResponse={apiResponse} />
-          
+        </div>  
+
+        {/* Directions */}
+        <div className='w-full rounded-lg overflow-hidden shadow-lg'>
           <Directions
             directions={[
               'Exit W0005 and turn right',

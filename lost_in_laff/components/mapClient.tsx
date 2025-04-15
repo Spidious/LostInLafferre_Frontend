@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { MapContainer, Marker, Popup, SVGOverlay, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -10,7 +10,7 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
  * @interface MapClientProps
  * @property {string} from - Starting location/room number. Format: "floor-room" (e.g., "basement-C0003")
  * @property {string} to - Destination location/room number. Format: "floor-room" (e.g., "firstLevel-C001")
- * @property {Object | null} [apiResponse] - Optional response from the API containing path data
+ * @property {object | null} [apiResponse] - Optional response from the API containing path data
  * @property {{ [key: number]: string }} svgFiles - SVG files for each floor
  */
 interface MapClientProps {
@@ -80,6 +80,18 @@ function AutoPanToMarker({
   // when the position changes
   return null;
 }
+
+
+// const zoomControlRef = useRef<HTMLDivElement>(null);
+
+// useEffect(() => {
+//   if(zoomControlRef.current) {
+//     L.DomEvent.disableClickPropagation(zoomControlRef.current);
+//     L.DomEvent.disableScrollPropagation(zoomControlRef.current);
+//   }
+// }, []);
+
+
 
 /**
  * @description Function to get the coordinates of a room from its name in the SVG
@@ -190,6 +202,15 @@ export const generatePathElementsFromResponse = (
  * @returns Element | null
  */
 const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
+  const floorControlRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if(floorControlRef.current) {
+      L.DomEvent.disableClickPropagation(floorControlRef.current);
+      L.DomEvent.disableScrollPropagation(floorControlRef.current);
+    }
+}, []);
+
   // State variable that holds the sizes of each SVG file
   const [svgSizes, setSvgSizes] = React.useState<{
     [key: number]: [number, number];
@@ -555,6 +576,9 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
   return (
     // MapContainer component from react-leaflet
     <MapContainer
+      className="w-full h-full rounded-xl shadow-lg border border-emerald-200 z-0"
+      // zoomControl={false} // adds zoom in/out buttons to map display
+      scrollWheelZoom={true}
     // Fill the parent container
       style={{ height: "100%", width: "100%" }}
       // Set the max scrollable bounds
@@ -573,7 +597,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
         {/* The viewBox is set to the current SVG element's viewBox or the default size */}
         {/* The dangerouslySetInnerHTML prop is used to set the inner HTML of the current SVG element */}
         {/* TODO: Check if this is necessary to render the SVG element correctly */}
-        {svgElement && (
+        {svgElement?.innerHTML && (
           <svg
             width="100%"
             height="100%"
@@ -594,7 +618,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
         {/* Render the path element inside the SVGOverlay */}
         {/* The viewBox is set to the current SVG element's viewBox or the default size */}
         {/* The dangerouslySetInnerHTML prop is used to set the generated path element */}
-        {pathElements && pathElements[floor] && (
+        {pathElements && pathElements[floor]?.innerHTML && (
           <svg
             width="100%"
             height="100%"
@@ -695,45 +719,49 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
       {/* Control panel for displaying the current floor number */}
       {/* This panel is displayed at the top center of the map */}
       {/* It shows the current floor number */}
-      <div className="leaflet-top leaflet-horiz-center">
+      {/* <div className="leaflet-top leaflet-horiz-center">
         <div
-          className="leaflet-control leaflet-bar p-2 bg-white shadow-md rounded-md"
+          className="leaflet-control leaflet-bar p-2 bg-white shadow-md rounded-lg"
           style={{ margin: "10px", padding: "8px", display: "block" }}
         >
           <span id="response">Floor Number: {floor}</span>
         </div>
-      </div>
+      </div> */}
+
 
       {/* Control panel for selecting the floor number */}
       {/* This panel is displayed at the right center of the map */}
       {/* It allows the user to select a floor number from 0 to 3 */}
       {/* The selected floor number is highlighted */}
-      <div
-        className="leaflet-bar leaflet-control leaflet-right leaflet-vert-center"
-        style={{ margin: "10px", display: "block", background: "white" }}
-      >
+      <div ref={floorControlRef} className="leaflet-top leaflet-right z-[1000] pointer-events-auto">
+          <div className="flex flex-col bg-white shadow-md rounded-lg p-2 m-3 space-y-1 sm:space-y-2">
         {[0, 1, 2, 3].map((floorNumber) => (
           // Render a link for each floor number
           <a
             key={floorNumber}
             // Set the background color based on the selected floor number
-            // If the floor number matches the current floor, set the background color to light gray
-            // Otherwise, set it to transparent
-            style={{
-              backgroundColor: floor == floorNumber ? "#c0c0c0" : "",
-            }}
+            // If the floor number matches the current floor, set the background color to green
+            // Otherwise, set it to gray
             href="#"
             title={`Go to floor ${floorNumber}`}
             role="button"
             aria-label={`Go to floor ${floorNumber}`}
             aria-disabled={floor === floorNumber}
             // Set the onClick event to update the floor number
-            onClick={() => setFloor(floorNumber)}
+            onClick={(e) => {
+              e.preventDefault(); // prevent scrolling to top
+              setFloor(floorNumber);
+            }}
+            className={`pointer-events-auto w-7 h-7 text-sm text-gray-800 visited:text-gray-800 sm:w-9 sm:h-9 sm:text-md rounded-md font-medium flex items-center justify-center transition-all 
+              ${floor === floorNumber
+                ? "bg-emerald-600 text-white shadow-inner"
+                : "bg-gray-100 text-gray-800 hover:bg-emerald-100"}`}
           >
             {/* Display the floor number */}
             <span aria-hidden="true">{floorNumber.toString()}</span>
           </a>
         ))}
+        </div>
       </div>
     </MapContainer>
   );
