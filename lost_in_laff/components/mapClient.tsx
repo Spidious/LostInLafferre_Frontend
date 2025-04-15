@@ -16,7 +16,7 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 interface MapClientProps {
   from: string;
   to: string;
-  apiResponse?: Object | null;
+  apiResponse?: object | null;
   svgFiles: { [key: number]: string };
 }
 
@@ -140,6 +140,57 @@ function getRoomCoordsFromName(
   // Return null if the room name is not found in the SVG
   return [0, 0];
 }
+
+export const generatePathElementsFromResponse = (
+  apiResponse: object
+): { [key: number]: SVGElement } => {
+  const coords: {[index: number]: {x: number, y: number, z: number}} = apiResponse as {[index: number]: {x: number, y: number, z: number}};
+  const newPathElements: { [key: number]: SVGElement } = {};
+
+  for (let floor = 0; floor <= 3; floor++) {
+    const pathSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+    const groups: Array<Array<{ x: number; y: number; z: number }>> = [];
+    let currentGroup: Array<{ x: number; y: number; z: number }> = [];
+
+    const coordArray = Object.values(coords);
+    coordArray.forEach((coord, index) => {
+      if (coord.z !== floor * 50) return;
+
+      if (index === 0 || coord.z === coordArray[index - 1]?.z) {
+        currentGroup.push(coord);
+      } else {
+        groups.push([...currentGroup]);
+        currentGroup = [coord];
+      }
+    });
+
+    if (currentGroup.length > 0) {
+      groups.push(currentGroup);
+    }
+
+    groups.forEach((group) => {
+      if (group.length === 1) {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", group[0].x.toString());
+        circle.setAttribute("cy", group[0].y.toString());
+        circle.setAttribute("r", "3");
+        circle.setAttribute("style", "fill:red;stroke:none");
+        pathSvg.appendChild(circle);
+      } else {
+        const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        const points = group.map((point) => `${point.x},${point.y}`).join(" ");
+        polyline.setAttribute("points", points);
+        polyline.setAttribute("style", "fill:none;stroke:red;stroke-width:3");
+        pathSvg.appendChild(polyline);
+      }
+    });
+
+    newPathElements[floor] = pathSvg;
+  }
+
+  return newPathElements;
+};
 
 /**
  * MapClient component
@@ -320,74 +371,12 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
     // If response found
     if (apiResponse) {
       try {
-        // Get all of the coords from the apiResponse
-        // The form of a coordinate is {index: {x: coord, y: coord, z:coord}}
-        const coords: {[index: number]: {x: number, y: number, z: number}} = apiResponse as {[index: number]: {x: number, y: number, z: number}};
-
-        // Create a new object to hold the path elements for each floor
-        const newPathElements: {[key: number]: SVGElement} = {};
-
-        // Loop through each floor
-        for (let floor = 0; floor <= 3; floor++) {
-          // Create a svg element to hold path elements
-          const pathSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-          
-          // Only look at the coords for that floor
-          // Verticality has a weight of 50 so floor 0 = z: 0, floor 1 = z: 50, ...
-          // Group consecutive coordinates
-          const groups: Array<Array<{x: number, y: number, z: number}>> = [];
-          let currentGroup: Array<{x: number, y: number, z: number}> = [];
-
-          Object.values(coords).forEach((coord, index) => {
-            // Skip wrong floor coords
-            if (coord.z !== floor * 50) return;
-
-            // If first coordinate of floor or same z as previous coordinate, add to current group
-            if (index === 0 || coord.z === coords[index - 1].z) {
-              currentGroup.push(coord);
-            } else {
-              // Else push current group and start a new one
-              groups.push([...currentGroup]);
-              currentGroup = [coord];
-            }
-          });
-
-          // If last currentGroup had coords then push it to groups
-          if (currentGroup.length > 0) {
-            groups.push(currentGroup);
-          }
-
-          // Create polyline or circle for each group
-          groups.forEach(group => {
-            if (group.length === 1) {
-              // Create circle for single point
-              const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-              circle.setAttribute("cx", group[0].x.toString());
-              circle.setAttribute("cy", group[0].y.toString());
-              circle.setAttribute("r", "3"); // radius of 3 units
-              circle.setAttribute("style", "fill:red;stroke:none");
-              pathSvg.appendChild(circle);
-            } else {
-              // Create polyline for multiple points
-              const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
-              const points = group.map(point => `${point.x},${point.y}`).join(" ");
-              polyline.setAttribute("points", points);
-              polyline.setAttribute("style", "fill:none;stroke:red;stroke-width:3");
-              pathSvg.appendChild(polyline);
-            }
-          });
-
-          // Set the pathElement for that floor to the newPathElements
-          newPathElements[floor] = pathSvg;
-        }
-
-        // Update the pathElements
+        const newPathElements = generatePathElementsFromResponse(apiResponse);
         setPathElements(newPathElements);
       } catch (error) {
         console.error("Error parsing API response:", error);
       }
     }
-
   }, [apiResponse]);
 
   /**
