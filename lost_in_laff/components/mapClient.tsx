@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { MapContainer, Marker, Popup, SVGOverlay, useMap, ZoomControl } from "react-leaflet";
+import { MapContainer, Marker, Popup, SVGOverlay, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility";
@@ -10,7 +10,7 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
  * @interface MapClientProps
  * @property {string} from - Starting location/room number. Format: "floor-room" (e.g., "basement-C0003")
  * @property {string} to - Destination location/room number. Format: "floor-room" (e.g., "firstLevel-C001")
- * @property {Object | null} [apiResponse] - Optional response from the API containing path data
+ * @property {object | null} [apiResponse] - Optional response from the API containing path data
  * @property {{ [key: number]: string }} svgFiles - SVG files for each floor
  */
 interface MapClientProps {

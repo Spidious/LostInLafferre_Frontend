@@ -85,9 +85,9 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
         {isListVisible && (
         <CommandList className='max-h-60 overflow-auto rounded-b-xl border-t border-gray-100 bg-white'>
           {/* Group the rooms together under a section header called 'Suggestions' */}
-          <CommandGroup heading="entrences">
+          <CommandGroup heading="Entrances">
             {(groupedOptions.entrances).map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
               className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
               </CommandItem>
@@ -95,7 +95,7 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
           </CommandGroup>
           <CommandGroup heading="Basement">
             {(groupedOptions.basement).map((option) => (
-             <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}
+             <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
                 className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
               </CommandItem>
@@ -103,7 +103,7 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
           </CommandGroup>
           <CommandGroup heading="First Floor">
             {(groupedOptions.firstLevel).map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
               className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
               </CommandItem>
@@ -111,7 +111,7 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
           </CommandGroup>
           <CommandGroup heading="Second Floor">
             {(groupedOptions.secondLevel).map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
               className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
               </CommandItem>
@@ -119,7 +119,7 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
           </CommandGroup>
           <CommandGroup heading="Third Level">
             {(groupedOptions.thirdLevel).map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.value)}
+              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
               className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
               </CommandItem>
