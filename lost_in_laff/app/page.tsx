@@ -64,7 +64,7 @@ export default function Home() {
           value={to}
           onChange={setTo}
           options={roomOptions}
-          placeholder="Select destination"
+          placeholder="Select destination point"
         />
 
         {/* Submit Button */}
