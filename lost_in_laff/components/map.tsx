@@ -45,11 +45,6 @@ const Map = ({ from, to, apiResponse }: MapProps) => {
 
   return (
     <div className="w-full aspect-square min-h-[250px] sm:min-h-[350px] relative rounded-xl border border-emerald-200 shadow-lg bg-white overflow-hidden">
-
-      <div className="absolute z-20 bottom-4 left-4 bg-white px-3 py-1 rounded-full shadow text-sm text-emerald-700 font-medium">
-        {from} {to}
-      </div>
-
       <div className="w-full h-full">
         <MapWithNoSSR from={from} to={to} apiResponse={apiResponse} svgFiles={floorsSVG} />
       </div>

@@ -703,7 +703,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
       {/* Control panel for displaying the API response */}
       {/* This panel is displayed at the bottom left corner of the map */}
       {/* It shows the API response or a message to submit to see the response */}
-      <div className="leaflet-bottom leaflet-left">
+      {/* <div className="leaflet-bottom leaflet-left">
         <div
           className="leaflet-control leaflet-bar p-2 bg-white shadow-md rounded-md"
           style={{ margin: "10px", padding: "8px", display: "block" }}
@@ -711,10 +711,10 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
           <span id="response">
             {apiResponse
               ? "Response had " + Object.keys(apiResponse).length + " points"
-              : "Submit to see API response"}
+              :"Submit to See API Response"}
           </span>
         </div>
-      </div>
+      </div> */}
 
       {/* Control panel for displaying the current floor number */}
       {/* This panel is displayed at the top center of the map */}
