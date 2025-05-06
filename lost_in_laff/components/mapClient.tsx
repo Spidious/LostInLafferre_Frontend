@@ -147,9 +147,9 @@ function getRoomCoordsFromName(
  * @param angleThreshold - The minimum angle (in degrees) to consider a turn significant.
  * @returns The smoothed path as an array of coordinates.
  */
-function smoothPath(
+export function smoothPath(
   path: Array<{ x: number; y: number; z: number }>,
-  angleThreshold: number = 50
+  angleThreshold: number = 60
 ): Array<{ x: number; y: number; z: number }> {
   if (path.length < 3) return path; // If the path has fewer than 3 points, return it as is.
 
@@ -171,13 +171,15 @@ function smoothPath(
 
     // Normalize the angle to the range [0, 180].
     const normalizedAngle = Math.abs((angle + 360) % 360);
+    // console.log("Angle: ", normalizedAngle)
 
     // If the angle exceeds the threshold, keep the current point.
-    if (normalizedAngle > angleThreshold) {
+    if (normalizedAngle > angleThreshold && normalizedAngle < 340) {
       smoothedPath.push(current);
     }
   }
 
+  console.log(" ")
   smoothedPath.push(path[path.length - 1]); // Add the last point.
   return smoothedPath;
 }
@@ -232,7 +234,8 @@ export const generatePathElementsFromResponse = (
       }
 
       // Smoothed Path
-      const smoothedGroup = smoothPath(group);
+      var smoothedGroup = smoothPath(group);
+      smoothedGroup = smoothPath(smoothedGroup,);
       if (smoothedGroup.length === 1) {
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", smoothedGroup[0].x.toString());

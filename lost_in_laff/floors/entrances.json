@@ -1,12 +1,12 @@
 {
-    "1": "Potential Energy, Entrance",
-    "2": "Mechanical, Aerospace, Entrance",
-    "3": "Shamrock, Entrance",
-    "4": "Racing, Entrance",
-    "5": "Naka, 9th Street, Entrance",
-    "6": "Parking Lot, Entrance",
-    "7": "Entrance",
-    "8": "Overholser, Entrance",
-    "9": "Mechanics Lab, Entrance",
-    "10": "Civil, Entrance"
+    "Entrance 1": "Potential Energy, Entrance",
+    "Entrance 2": "Mechanical, Aerospace, Entrance",
+    "Entrance 3": "Shamrock, Entrance",
+    "Entrance 4": "Racing, Entrance",
+    "Entrance 5": "Naka, 9th Street, Entrance",
+    "Entrance 6": "Parking Lot, Entrance",
+    "Entrance 7": "Entrance",
+    "Entrance 8": "Overholser, Entrance",
+    "Entrance 9": "Mechanics Lab, Entrance",
+    "Entrance 10": "Civil, Entrance"
 }

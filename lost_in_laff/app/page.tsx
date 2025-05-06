@@ -36,14 +36,16 @@ export default function Home() {
 
   const handleSubmit = async () => {
     try {
-    const toRoomName = to.split("-")[1];
-    const fromRoomName = from.split("-")[1];
-      const response = await getCoordinateData({ from: fromRoomName, to: toRoomName });
-      setApiResponse(response);
-      console.log('Response from API:', response);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+      console.log('From:', from, 'To:', to);
+      const toRoomName = to.split("-")[1];
+      const fromRoomName = from.split("-")[1];
+      console.log('From:', fromRoomName, 'To:', toRoomName);
+        const response = await getCoordinateData({ from: fromRoomName, to: toRoomName });
+        setApiResponse(response);
+        console.log('Response from API:', response);
+      } catch (error) {
+        console.error('Error:', error);
+      }
   };
 
   return (
@@ -79,11 +81,7 @@ export default function Home() {
         {/* Directions */}
         <div className='w-full rounded-lg overflow-hidden shadow-lg'>
           <Directions
-            directions={[
-              'Exit W0005 and turn right',
-              'Walk straight for 20 meters',
-              'Your destination W0014 will be on your left'
-            ]}
+            apiResponse={apiResponse}
           />
         </div>
       </main>
