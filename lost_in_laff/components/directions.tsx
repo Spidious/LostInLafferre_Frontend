@@ -5,7 +5,7 @@ interface DirectionsProps {
   apiResponse: object | null;
 }
 
-  // Add these utility functions at the top of the file after the imports
+// Add these utility functions at the top of the file after the imports
 type Point = [number, number];
 type Direction = 'N' | 'S' | 'E' | 'W';
 
@@ -38,11 +38,21 @@ const getTurnDirection = (currentDirection: Direction, targetBearing: number): s
   return 'turn right';
 };
 
+// Add this function after the type definitions
+const getInitialDirection = (path: Point[]): Direction => {
+  if (path.length < 2) return 'E'; // Default to East if not enough points
+  
+  const [start, end] = path;
+  const bearing = calculateBearing(start, end);
+  return getDirection(bearing);
+};
+
+// Then modify the generateDirections function to use it
 const generateDirections = (path: Point[]): string[] => {
   if (path.length < 2) return [];
   
   const directions: string[] = [];
-  let currentDirection: Direction = 'E'; // Assuming starting facing east
+  let currentDirection = getInitialDirection(path);
   
   for (let i = 0; i < path.length - 1; i++) {
     const start = path[i];
@@ -55,7 +65,6 @@ const generateDirections = (path: Point[]): string[] => {
                 (end[1] - start[1]))
       )
     );
-    console.log(end[0] - start[0] + end[1] - start[1])
     
     directions.push(`${turn}, then walk ${distance} feet`);
     currentDirection = getDirection(bearing);
