@@ -4,7 +4,7 @@ describe('Directions Component', () => {
     cy.visit('http://localhost:3000', { failOnStatusCode: false });
   });
 
-  it('should display initial message when no locations selected', () => {
+  it('should display initial message when page first loads', () => {
       cy.get('.text-emerald-600').should('contain', 'Select locations to get directions');
   });
 });
