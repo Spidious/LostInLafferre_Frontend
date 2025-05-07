@@ -141,14 +141,61 @@ function getRoomCoordsFromName(
   return [0, 0];
 }
 
+/**
+ * @description Smooths the path by keeping only significant turns (left/right).
+ * @param path - The original path as an array of coordinates [{x, y, z}, ...].
+ * @param angleThreshold - The minimum angle (in degrees) to consider a turn significant.
+ * @returns The smoothed path as an array of coordinates.
+ */
+export function smoothPath(
+  path: Array<{ x: number; y: number; z: number }>,
+  angleThreshold: number = 60
+): Array<{ x: number; y: number; z: number }> {
+  if (path.length < 3) return path; // If the path has fewer than 3 points, return it as is.
+
+  const smoothedPath: Array<{ x: number; y: number; z: number }> = [path[0]]; // Start with the first point.
+
+  for (let i = 1; i < path.length - 1; i++) {
+    const prev = path[i - 1];
+    const current = path[i];
+    const next = path[i + 1];
+
+    // Calculate the vectors for the current and next segments.
+    const vector1 = { x: current.x - prev.x, y: current.y - prev.y };
+    const vector2 = { x: next.x - current.x, y: next.y - current.y };
+
+    // Calculate the angle between the two vectors.
+    const angle =
+      (Math.atan2(vector2.y, vector2.x) - Math.atan2(vector1.y, vector1.x)) *
+      (180 / Math.PI);
+
+    // Normalize the angle to the range [0, 180].
+    const normalizedAngle = Math.abs((angle + 360) % 360);
+    // console.log("Angle: ", normalizedAngle)
+
+    // If the angle exceeds the threshold, keep the current point.
+    if (normalizedAngle > angleThreshold && normalizedAngle < 340) {
+      smoothedPath.push(current);
+    }
+  }
+
+  console.log(" ")
+  smoothedPath.push(path[path.length - 1]); // Add the last point.
+  return smoothedPath;
+}
+
 export const generatePathElementsFromResponse = (
   apiResponse: object
-): { [key: number]: SVGElement } => {
-  const coords: {[index: number]: {x: number, y: number, z: number}} = apiResponse as {[index: number]: {x: number, y: number, z: number}};
-  const newPathElements: { [key: number]: SVGElement } = {};
+): { original: { [key: number]: SVGElement }; smoothed: { [key: number]: SVGElement } } => {
+  const coords: { [index: number]: { x: number; y: number; z: number } } =
+    apiResponse as { [index: number]: { x: number; y: number; z: number } };
+
+  const originalPathElements: { [key: number]: SVGElement } = {};
+  const smoothedPathElements: { [key: number]: SVGElement } = {};
 
   for (let floor = 0; floor <= 3; floor++) {
-    const pathSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const pathSvgOriginal = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    const pathSvgSmoothed = document.createElementNS("http://www.w3.org/2000/svg", "svg");
 
     const groups: Array<Array<{ x: number; y: number; z: number }>> = [];
     let currentGroup: Array<{ x: number; y: number; z: number }> = [];
@@ -170,26 +217,46 @@ export const generatePathElementsFromResponse = (
     }
 
     groups.forEach((group) => {
+      // Original Path
       if (group.length === 1) {
         const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
         circle.setAttribute("cx", group[0].x.toString());
         circle.setAttribute("cy", group[0].y.toString());
         circle.setAttribute("r", "3");
         circle.setAttribute("style", "fill:red;stroke:none");
-        pathSvg.appendChild(circle);
+        pathSvgOriginal.appendChild(circle);
       } else {
         const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
         const points = group.map((point) => `${point.x},${point.y}`).join(" ");
         polyline.setAttribute("points", points);
         polyline.setAttribute("style", "fill:none;stroke:red;stroke-width:3");
-        pathSvg.appendChild(polyline);
+        pathSvgOriginal.appendChild(polyline);
+      }
+
+      // Smoothed Path
+      var smoothedGroup = smoothPath(group);
+      smoothedGroup = smoothPath(smoothedGroup,);
+      if (smoothedGroup.length === 1) {
+        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        circle.setAttribute("cx", smoothedGroup[0].x.toString());
+        circle.setAttribute("cy", smoothedGroup[0].y.toString());
+        circle.setAttribute("r", "3");
+        circle.setAttribute("style", "fill:blue;stroke:none");
+        pathSvgSmoothed.appendChild(circle);
+      } else {
+        const polyline = document.createElementNS("http://www.w3.org/2000/svg", "polyline");
+        const points = smoothedGroup.map((point: any) => `${point.x},${point.y}`).join(" ");
+        polyline.setAttribute("points", points);
+        polyline.setAttribute("style", "fill:none;stroke:blue;stroke-width:3");
+        pathSvgSmoothed.appendChild(polyline);
       }
     });
 
-    newPathElements[floor] = pathSvg;
+    originalPathElements[floor] = pathSvgOriginal;
+    smoothedPathElements[floor] = pathSvgSmoothed;
   }
 
-  return newPathElements;
+  return { original: originalPathElements, smoothed: smoothedPathElements };
 };
 
 /**
@@ -233,6 +300,10 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
 
   // State variable for pathElements of each floor
   const [pathElements, setPathElements] = React.useState<{
+    [key: number]: SVGElement | null;
+  } | null>(null);
+
+  const [smoothedPath, setSmoothedPath] = React.useState<{
     [key: number]: SVGElement | null;
   } | null>(null);
 
@@ -371,8 +442,9 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
     // If response found
     if (apiResponse) {
       try {
-        const newPathElements = generatePathElementsFromResponse(apiResponse);
+        const { original: newPathElements, smoothed: smoothedPath } = generatePathElementsFromResponse(apiResponse);
         setPathElements(newPathElements);
+        setSmoothedPath(smoothedPath);
       } catch (error) {
         console.error("Error parsing API response:", error);
       }
@@ -629,7 +701,21 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
             dangerouslySetInnerHTML={{ __html: pathElements[floor].innerHTML }}
           />
         )}
+
+          {/* Render the smoothed path */}
+          {smoothedPath && smoothedPath[floor]?.innerHTML && (
+            <svg
+              width="100%"
+              height="100%"
+              viewBox={
+                svgElement.getAttribute("viewBox") ||
+                `0 0 ${svgSizes[floor][1]} ${svgSizes[floor][0]}`
+              }
+              dangerouslySetInnerHTML={{ __html: smoothedPath[floor].innerHTML }}
+            />
+          )}
       </SVGOverlay>
+
 
       {/* Markers for the starting and destination locations */}
       {/* These markers are displayed on the map at the coordinates of the from and to locations */}
@@ -737,29 +823,31 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
           <div className="flex flex-col bg-white shadow-md rounded-lg p-2 m-3 space-y-1 sm:space-y-2">
         {[0, 1, 2, 3].map((floorNumber) => (
           // Render a link for each floor number
-          <a
+            <a
             key={floorNumber}
-            // Set the background color based on the selected floor number
-            // If the floor number matches the current floor, set the background color to green
-            // Otherwise, set it to gray
             href="#"
             title={`Go to floor ${floorNumber}`}
             role="button"
             aria-label={`Go to floor ${floorNumber}`}
             aria-disabled={floor === floorNumber}
-            // Set the onClick event to update the floor number
             onClick={(e) => {
               e.preventDefault(); // prevent scrolling to top
               setFloor(floorNumber);
             }}
-            className={`pointer-events-auto w-7 h-7 text-sm text-gray-800 visited:text-gray-800 sm:w-9 sm:h-9 sm:text-md rounded-md font-medium flex items-center justify-center transition-all 
-              ${floor === floorNumber
-                ? "bg-emerald-600 text-white shadow-inner"
-                : "bg-gray-100 text-gray-800 hover:bg-emerald-100"}`}
-          >
-            {/* Display the floor number */}
-            <span aria-hidden="true">{floorNumber.toString()}</span>
-          </a>
+            className={`pointer-events-auto w-7 h-7 text-sm sm:w-9 sm:h-9 sm:text-md rounded-md font-medium flex items-center justify-center transition-all ${
+              floor === floorNumber
+              ? "bg-emerald-600 shadow-inner"
+              : "bg-gray-100 hover:bg-emerald-100"
+            }`}
+            >
+            {/* Display the floor number with dynamic text color */}
+            <span
+              aria-hidden="true"
+              className={floor === floorNumber ? "text-white" : "text-black"}
+            >
+              {floorNumber.toString()}
+            </span>
+            </a>
         ))}
         </div>
       </div>
