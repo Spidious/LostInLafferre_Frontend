@@ -263,4 +263,59 @@ describe('Directions Component with Valid API Response', () => {
       .contains('Next')
       .should('be.disabled');
   });
+
+  describe('Checking Written Direction Changes', () => {
+    beforeEach(() => {
+      // Mount component
+      cy.mount(<Directions apiResponse={mockApiResponse} />);
+
+      // Store first direction text
+      cy.get('.text-emerald-700')
+        .invoke('text')
+        .as('firstDirection');
+
+      // Click next button
+      cy.get('button')
+        .contains('Next')
+        .click();
+
+      // Store second direction text
+      cy.get('.text-emerald-700')
+        .invoke('text')
+        .as('secondDirection');
+    });
+
+    it('should display the next direction when next button is clicked', () => {
+      // Click next button
+      cy.get('button')
+        .contains('Next')
+        .click();
+
+      // Verify the new direction is different from the first
+      cy.get('.text-emerald-700').then(($newDirection) => {
+        cy.get('@secondDirection').then((secondDirection) => {
+          expect($newDirection).to.not.equal(secondDirection);
+        });
+      });
+    });
+
+    it('should display the previous direction when previous button is clicked', () => {
+      // Click next button
+      cy.get('button')
+        .contains('Next')
+        .click();
+
+      // Click back button
+      cy.get('button')
+        .contains('Back')
+        .click();
+
+      // Verify the new direction is different from the first
+      cy.get('.text-emerald-700').then(($newDirection) => {
+        cy.get('@firstDirection').then((firstDirection) => {
+          expect($newDirection).to.not.equal(firstDirection);
+        });
+      });
+    });
+  });
 });
