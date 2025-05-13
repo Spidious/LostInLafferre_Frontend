@@ -3,6 +3,7 @@ import { generatePathElementsFromResponse } from './mapClient';
 
 interface DirectionsProps {
   apiResponse: object | null;
+  onNext?: () => void;
 }
 
 // Add these utility functions at the top of the file after the imports
@@ -74,7 +75,7 @@ const generateDirections = (path: Point[]): string[] => {
 };
 
 // Modify the Directions component to use the generated directions
-const Directions = ({ apiResponse }: DirectionsProps) => {
+const Directions = ({ apiResponse, onNext }: DirectionsProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [directions, setDirections] = useState<string[]>([]);
 
@@ -110,6 +111,7 @@ const Directions = ({ apiResponse }: DirectionsProps) => {
   const handleNext = () => {
     if (currentStep < directions.length - 1) {
       setCurrentStep(currentStep + 1);
+      onNext?.(); // Call the test spy if provided
     }
   };
 
