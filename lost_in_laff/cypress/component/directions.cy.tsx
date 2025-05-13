@@ -239,4 +239,28 @@ describe('Directions Component with Valid API Response', () => {
       .contains('Back')
       .should('be.disabled');
   });
+
+  it('should disable the next button on the last step', () => {
+    // Mount component with the spy
+    cy.mount(
+      <Directions 
+        apiResponse={mockApiResponse}
+      />
+    );
+
+    // Click through to the last step
+    for (let i = 0; i < 4; i++) {
+      cy.get('button')
+        .contains('Next')
+        .click();
+    }
+
+    // Verify we are on the last step
+    cy.get('.text-emerald-700').should('contain', 'Step 5 of');
+
+    // Verify the Next button is disabled
+    cy.get('button')
+      .contains('Next')
+      .should('be.disabled');
+  });
 });
