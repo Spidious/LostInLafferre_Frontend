@@ -74,7 +74,7 @@ export default function Home() {
 
 
         {/* Map Component */}
-        <div className='w-full h-[400px] rounded-lg overflow-hidden shadow-lg bg-white'>
+        <div className='w-full rounded-lg overflow-hidden shadow-lg bg-white'>
           <Map from={from} to={to} apiResponse={apiResponse} />
         </div>  
 
