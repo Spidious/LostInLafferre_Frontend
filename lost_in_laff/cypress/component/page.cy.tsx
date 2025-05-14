@@ -1,7 +1,7 @@
 import React from 'react'
 import Home from '../../app/page'
 
-describe('<Home />', () => {
+describe('Page', () => {
   beforeEach(() => {
     cy.mount(<Home />)
   })
