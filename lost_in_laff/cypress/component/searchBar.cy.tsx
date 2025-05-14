@@ -5,12 +5,11 @@ describe('SearchBar Component Option Sorting', () => {
   it('should sort room options into correct floor groups', () => {
     // Mock room options
     const mockOptions = [
+      {value: 'entrances-Entrance 3', label: 'Entrance 3 (Shamrock, Entrance)'},
       {value: 'basement-W0005', label: 'W0005 (MSP,Mizzou,Space,Program,Aero,Tigers,Club)'},
-      // {value: 'basement-W0003', label: 'W0003 (Environmental,Lab)'},
-      // {value: 'basement-W0009', label: 'W0009 (AR,VR,Lab,Labs)'},
-      // {value: 'basement-W0010', label: 'W0010 (AR,VR,Lab,Labs)'},
-      // {value: 'basement-W0013', label: 'W0013 '},
-      // {value: 'basement-W0014', label: 'W0014 (Machine,Shop)'},
+      {value: 'firstLevel-E1509', label: 'E1509 '},
+      {value: 'secondLevel-C2207', label: 'C2207 (Research,Lab)'},
+      {value: 'thirdLevel-C3202', label: 'C3202 '}
     ];
 
     // Mount component
@@ -29,6 +28,8 @@ describe('SearchBar Component Option Sorting', () => {
     // Check each floor group exists and contains correct rooms
     cy.get('div').contains('Entrances')
       .parent()
+      .find('[class*="px-4 py-2"]')
+      .should('contain', 'Entrance 3');
 
     cy.get('div').contains('Basement')
       .parent()
@@ -37,11 +38,17 @@ describe('SearchBar Component Option Sorting', () => {
 
     cy.get('div').contains('First Floor')
       .parent()
+      .find('[class*="px-4 py-2"]')
+      .should('contain', 'E1509');
 
     cy.get('div').contains('Second Floor')
       .parent()
+      .find('[class*="px-4 py-2"]')
+      .should('contain', 'C2207');
 
     cy.get('div').contains('Third Level')
       .parent()
+      .find('[class*="px-4 py-2"]')
+      .should('contain', 'C3202');
   });
 });
