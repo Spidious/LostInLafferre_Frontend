@@ -1,0 +1,23 @@
+name: Sync from upstream
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # every month
+  workflow_dispatch:     # manual trigger
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mirror repo
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/Spidious/LostInLafferre_Frontend.git
+          git fetch upstream
+          git merge upstream/demo_branch --allow-unrelated-histories -m "Sync from upstream"
+          git push origin main
