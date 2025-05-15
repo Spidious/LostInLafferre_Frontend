@@ -703,7 +703,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
         )}
 
           {/* Render the smoothed path */}
-          {smoothedPath && smoothedPath[floor]?.innerHTML && (
+          {/* {smoothedPath && smoothedPath[floor]?.innerHTML && (
             <svg
               width="100%"
               height="100%"
@@ -713,7 +713,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
               }
               dangerouslySetInnerHTML={{ __html: smoothedPath[floor].innerHTML }}
             />
-          )}
+          )} */}
       </SVGOverlay>
 
 
