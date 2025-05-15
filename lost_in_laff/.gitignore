@@ -40,5 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# Not release maps
-/public/maps/*
+# These maps are releasable to the public
+# /public/maps/*

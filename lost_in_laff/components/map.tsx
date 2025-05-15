@@ -37,10 +37,10 @@ const MapWithNoSSR = dynamic(
 
 const Map = ({ from, to, apiResponse }: MapProps) => {
   const floorsSVG = {
-    0: "/maps/zero_frontend.svg",
-    1: "/maps/one_frontend.svg",
-    2: "/maps/two_frontend.svg",
-    3: "/maps/three_frontend.svg",
+    0: "/maps/test_one_frontend.svg",
+    // 1: "/maps/one_frontend.svg",
+    // 2: "/maps/two_frontend.svg",
+    // 3: "/maps/three_frontend.svg",
   }
 
   return (
