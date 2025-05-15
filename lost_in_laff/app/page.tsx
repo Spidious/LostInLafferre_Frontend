@@ -5,12 +5,8 @@ import SearchBar from '@/components/searchBar';
 import Map from '@/components/map';
 import Directions from '@/components/directions';
 import { getCoordinateData } from '@/services/getCoordinates';
-// import basement from '@/floors/basement.json';
-// import firstLevel from '@/floors/firstLevel.json';
-// import secondLevel from '@/floors/secondLevel.json';
-// import thirdLevel from '@/floors/thirdLevel.json';
-import testOne from '@/floors/testOneLevel.json';
-// import entrances from '@/floors/entrances.json';
+import testOne from '@/floors/test_one.json';
+import testTwo from '@/floors/test_two.json';
 import Image from 'next/image';
 import logo from '@/public/Lost In Lafferre Logo.png';
 
@@ -21,12 +17,8 @@ export default function Home() {
   const [apiResponse, setApiResponse] = useState(null);
 
   const floors = {
-    // entrances,
     testOne,
-    // basement,
-    // firstLevel,
-    // secondLevel,
-    // thirdLevel
+    testTwo,
   };
 
   const roomOptions = Object.entries(floors).flatMap(([floorName, floorData]) =>
