@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { generatePathElementsFromResponse } from './mapClient';
 
 interface DirectionsProps {
@@ -74,92 +75,13 @@ const generateDirections = (path: Point[]): string[] => {
   return directions;
 };
 
-// Modify the Directions component to use the generated directions
+const DirectionsClient = dynamic(
+  () => import('./directionsClient'),
+  { ssr: false }
+);
+
 const Directions = ({ apiResponse, onNext }: DirectionsProps) => {
-  const [currentStep, setCurrentStep] = useState(0);
-  const [directions, setDirections] = useState<string[]>([]);
-
-  const smoothedPath = React.useMemo(() => 
-    apiResponse ? 
-      Object.values(generatePathElementsFromResponse(apiResponse).smoothed)
-        .flatMap(svg => {
-          const polyline = svg.querySelector('polyline');
-          if (!polyline) return [];
-          
-          const points = polyline.getAttribute('points');
-          if (!points) return [];
-          
-          return points.trim().split(' ').map(pair => {
-            const [x, y] = pair.split(',').map(Number);
-            return [x, y] as Point;
-          });
-        }) 
-    : null,
-    [apiResponse] // Only recompute when apiResponse changes
-  );
-  
-  // Add useEffect to generate directions when smoothedPath changes
-  React.useEffect(() => {
-    if (smoothedPath) {
-      const newDirections = generateDirections(smoothedPath);
-      setDirections(newDirections);
-      console.log("Directions: ", directions)
-      setCurrentStep(0);
-    }
-  }, [smoothedPath]);
-
-  const handleNext = () => {
-    if (currentStep < directions.length - 1) {
-      setCurrentStep(currentStep + 1);
-      onNext?.(); // Call the test spy if provided
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
-  return (
-    <div className="bg-emerald-50 rounded-lg p-4 border-2 border-emerald-200">
-      <h3 className="text-emerald-800 font-semibold mb-2">Directions</h3>
-      {directions.length > 0 ? (
-        <div className="space-y-4">
-          <div className="text-emerald-700">
-            <span className="font-medium">Step {currentStep + 1} of {directions.length}: </span>
-            {directions[currentStep]}
-          </div>
-          <div className="flex justify-between pt-2">
-            <button
-              onClick={handleBack}
-              disabled={currentStep === 0}
-              className={`px-4 py-2 rounded-md ${
-                currentStep === 0
-                  ? 'bg-gray-100 text-gray-400'
-                  : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-              }`}
-            >
-              Back
-            </button>
-            <button
-              onClick={handleNext}
-              disabled={currentStep === directions.length - 1}
-              className={`px-4 py-2 rounded-md ${
-                currentStep === directions.length - 1
-                  ? 'bg-gray-100 text-gray-400'
-                  : 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-              }`}
-            >
-              Next
-            </button>
-          </div>
-        </div>
-      ) : (
-        <p className="text-emerald-600">Select locations to get directions</p>
-      )}
-    </div>
-  );
+  return <DirectionsClient apiResponse={apiResponse} onNext={onNext} />;
 };
 
 export default Directions;
