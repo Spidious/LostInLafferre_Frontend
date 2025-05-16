@@ -5,7 +5,7 @@ interface SourceDestinationData {
   to: string;
 }
 
-const BASE_URL = 'http://localhost:8080'; 
+const BASE_URL = 'https://lostinlafferre-backend.onrender.com'; 
 
 export const getCoordinateData = async (data: SourceDestinationData) => {
   const endpoint = `/rooms/${data.from}/${data.to}`;

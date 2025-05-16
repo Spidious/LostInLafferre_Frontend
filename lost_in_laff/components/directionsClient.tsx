@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { generatePathElementsFromResponse } from './mapClient';
 
 interface DirectionsClientProps {
-  apiResponse: object | null;
+  apiResponse: any;
   onNext?: () => void;
 }
 
@@ -66,25 +66,36 @@ const generateDirections = (path: Point[]): string[] => {
 const DirectionsClient = ({ apiResponse, onNext }: DirectionsClientProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [directions, setDirections] = useState<string[]>([]);
+  const [pathElements, setPathElements] = useState<any>(null);
 
-  const smoothedPath = React.useMemo(() => 
-    apiResponse ? 
-      Object.values(generatePathElementsFromResponse(apiResponse).smoothed)
-        .flatMap(svg => {
-          const polyline = svg.querySelector('polyline');
-          if (!polyline) return [];
-          
-          const points = polyline.getAttribute('points');
-          if (!points) return [];
-          
-          return points.trim().split(' ').map(pair => {
-            const [x, y] = pair.split(',').map(Number);
-            return [x, y] as Point;
-          });
-        }) 
-    : [],
-    [apiResponse]
-  );
+  // Use useEffect to generate path elements on the client side
+  useEffect(() => {
+    if (apiResponse && typeof window !== 'undefined') {
+      const elements = generatePathElementsFromResponse(apiResponse);
+      setPathElements(elements);
+    }
+  }, [apiResponse]);
+
+  const smoothedPath = React.useMemo(() => {
+    if (!pathElements?.smoothed) return [];
+    
+    return Object.values(pathElements.smoothed)
+      .flatMap(svg => {
+        if (!svg || typeof svg !== 'object') return [];
+        const element = svg as Element;
+        
+        const polyline = element.querySelector('polyline');
+        if (!polyline) return [];
+        
+        const points = polyline.getAttribute('points');
+        if (!points) return [];
+        
+        return points.trim().split(' ').map((pair: string) => {
+          const [x, y] = pair.split(',').map(Number);
+          return [x, y] as Point;
+        });
+      });
+  }, [pathElements]);
   
   useEffect(() => {
     if (smoothedPath) {
