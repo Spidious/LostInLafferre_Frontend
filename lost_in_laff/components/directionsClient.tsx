@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { generatePathElementsFromResponse } from './mapClient';
+import generatePathElementsFromResponse from './mapClient';
 
 interface DirectionsClientProps {
   apiResponse: any;
