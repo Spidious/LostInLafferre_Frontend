@@ -11,11 +11,8 @@ interface SearchBarProps {
 
 const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) => {
   const groupedOptions: Record<string, typeof options> = {
-    basement: [],
-    firstLevel: [],
-    secondLevel: [],
-    thirdLevel: [],
-    entrances: []
+    one: [],
+    two: [],
   };
   const [isListVisible, setIsListVisible] = useState(false);
   const [isMounted, setIsMounted] = useState(false); // Handels the SSR mismatch issue
@@ -40,20 +37,11 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
   
   options.forEach(option => {
     switch (true) {
-      case option.value.startsWith('basement'):
-        groupedOptions.basement.push(option);
+      case option.value.startsWith('One-'):
+        groupedOptions.one.push(option);
         break;
-      case option.value.startsWith('firstLevel'):
-        groupedOptions.firstLevel.push(option);
-        break;
-      case option.value.startsWith('secondLevel'):
-        groupedOptions.secondLevel.push(option);
-        break;
-      case option.value.startsWith('thirdLevel'):
-        groupedOptions.thirdLevel.push(option);
-        break;
-      default:
-        groupedOptions.entrances.push(option);
+      case option.value.startsWith('Two-'):
+        groupedOptions.two.push(option);
         break;
     }
   });
@@ -85,24 +73,8 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
         {isListVisible && (
         <CommandList className='max-h-60 overflow-auto rounded-b-xl border-t border-gray-100 bg-white'>
           {/* Group the rooms together under a section header called 'Suggestions' */}
-          <CommandGroup heading="Entrances">
-            {(groupedOptions.entrances).map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
-              className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
-                {option.label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-          <CommandGroup heading="Basement">
-            {(groupedOptions.basement).map((option) => (
-             <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
-                className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
-                {option.label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
           <CommandGroup heading="First Floor">
-            {(groupedOptions.firstLevel).map((option) => (
+            {(groupedOptions.one).map((option) => (
               <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
               className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
@@ -110,15 +82,7 @@ const SearchBar = ({ value, onChange, options, placeholder }: SearchBarProps) =>
             ))}
           </CommandGroup>
           <CommandGroup heading="Second Floor">
-            {(groupedOptions.secondLevel).map((option) => (
-              <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
-              className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
-                {option.label}
-              </CommandItem>
-            ))}
-          </CommandGroup>
-          <CommandGroup heading="Third Level">
-            {(groupedOptions.thirdLevel).map((option) => (
+            {(groupedOptions.two).map((option) => (
               <CommandItem key={option.value} value={`${option.value} ${option.label}`} onSelect={() => handleSelect(option.label, option.value)}
               className='px-4 py-2 hover:bg-emerald-100 cursor-pointer transition-all'>
                 {option.label}
