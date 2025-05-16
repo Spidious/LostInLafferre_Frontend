@@ -24,10 +24,8 @@ interface MapClientProps {
 // This is a mapping of floor names to their respective indices
 // For example, "basement" is mapped to 0, "firstLevel" to 1, etc.
 const mapConverter: { [key: string]: number } = {
-  basement: 0,
-  firstLevel: 1,
-  secondLevel: 2,
-  thirdLevel: 3,
+  One: 1,
+  Two: 2,
 };
 
 /**
@@ -289,7 +287,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
     [key: number]: SVGElement | null;
   } | null>(null);
   // State variable that holds the current floor number
-  const [floor, setFloor] = React.useState<number>(0);
+  const [floor, setFloor] = React.useState<number>(1);
 
   // State variable that holds the coordinates of the starting location
   const [fromCoords, setFromCoords] = React.useState<[number, number] | null>(
@@ -821,7 +819,7 @@ const MapClient = ({ from, to, svgFiles, apiResponse }: MapClientProps) => {
       {/* The selected floor number is highlighted */}
       <div ref={floorControlRef} className="leaflet-top leaflet-right z-[1000] pointer-events-auto">
           <div className="flex flex-col bg-white shadow-md rounded-lg p-2 m-3 space-y-1 sm:space-y-2">
-        {[0, 1, 2, 3].map((floorNumber) => (
+        {[1, 2].map((floorNumber) => (
           // Render a link for each floor number
             <a
             key={floorNumber}
