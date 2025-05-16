@@ -1,5 +1,6 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
-import generatePathElementsFromResponse from './mapClient';
 
 interface DirectionsClientProps {
   apiResponse: any;
@@ -8,6 +9,20 @@ interface DirectionsClientProps {
 
 type Point = [number, number];
 type Direction = 'N' | 'S' | 'E' | 'W';
+
+const processPathData = (coords: { [key: string]: any }) => {
+  const pathsByFloor: { [floor: number]: Point[] } = {};
+  
+  Object.values(coords).forEach((coord: any) => {
+    const floor = Math.floor(coord.z / 50);
+    if (!pathsByFloor[floor]) {
+      pathsByFloor[floor] = [];
+    }
+    pathsByFloor[floor].push([coord.x, coord.y] as Point);
+  });
+
+  return pathsByFloor;
+};
 
 const calculateBearing = (start: Point, end: Point): number => {
   const [x1, y1] = start;
@@ -66,36 +81,19 @@ const generateDirections = (path: Point[]): string[] => {
 const DirectionsClient = ({ apiResponse, onNext }: DirectionsClientProps) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [directions, setDirections] = useState<string[]>([]);
-  const [pathElements, setPathElements] = useState<any>(null);
-
-  // Use useEffect to generate path elements on the client side
-  useEffect(() => {
-    if (apiResponse && typeof window !== 'undefined') {
-      const elements = generatePathElementsFromResponse(apiResponse);
-      setPathElements(elements);
-    }
-  }, [apiResponse]);
 
   const smoothedPath = React.useMemo(() => {
-    if (!pathElements?.smoothed) return [];
+    if (!apiResponse) return [];
     
-    return Object.values(pathElements.smoothed)
-      .flatMap(svg => {
-        if (!svg || typeof svg !== 'object') return [];
-        const element = svg as Element;
-        
-        const polyline = element.querySelector('polyline');
-        if (!polyline) return [];
-        
-        const points = polyline.getAttribute('points');
-        if (!points) return [];
-        
-        return points.trim().split(' ').map((pair: string) => {
-          const [x, y] = pair.split(',').map(Number);
-          return [x, y] as Point;
-        });
-      });
-  }, [pathElements]);
+    try {
+      const pathsByFloor = processPathData(apiResponse);
+      // Combine all floor paths into a single path
+      return Object.values(pathsByFloor).flat();
+    } catch (error) {
+      console.error('Error processing path data:', error);
+      return [];
+    }
+  }, [apiResponse]);
   
   useEffect(() => {
     if (smoothedPath) {
